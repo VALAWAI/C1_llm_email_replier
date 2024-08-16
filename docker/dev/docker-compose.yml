@@ -1,0 +1,69 @@
+services:
+  mq:
+    image: rabbitmq:${RABBITMQ_TAG:-management}
+    container_name: mov_mq_dev
+    restart: unless-stopped
+    ports:
+      - ${MQ_PORT:-5672}:5672
+      - ${MQ_UI_PORT:-8081}:15672
+    networks:
+      - c0_email_actuator_dev
+    environment:
+      RABBITMQ_DEFAULT_USER: ${MQ_USER:-mov}
+      RABBITMQ_DEFAULT_PASS: ${MQ_PASSWORD:-password}
+  mongo:
+    image: mongo:${MONGO_TAG:-latest}
+    container_name: mov_db_dev
+    restart: unless-stopped
+    ports:
+      - ${MONGO_PORT:-27017}:27017
+    networks:
+      - c0_email_actuator_dev
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-movDB}
+    volumes:
+      - ./initialize-movDB.js:/docker-entrypoint-initdb.d/init-mongo.js
+      - ${MONGO_LOCAL_DATA:-~/mongo_data/movDB}:/data/db
+  mongo_express:
+    image: mongo-express:${MONGO_EXPRESS_TAG:-latest}
+    container_name: mov_db_ui_dev
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - ${MONGO_ADMIN_PORT:-8082}:8081
+    networks:  
+      - c0_email_actuator_dev
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_ADMIN_USER:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_ADMIN_PASSWORD:-password}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USER:-root}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-password}
+      ME_CONFIG_MONGODB_PORT: ${MONGO_PORT:-27017}
+      ME_CONFIG_MONGODB_SERVER: mongo
+  mov:
+    image: valawai/mov:${MOV_TAG:-latest}
+    container_name: mov_dev
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - mq
+    ports:
+      - ${MOV_UI_PORT:-8084}:8080
+    networks:  
+      - c0_email_actuator_dev
+    environment:
+      RABBITMQ_HOST: mq
+      RABBITMQ_PORT: ${MQ_PORT:-5672}
+      RABBITMQ_USERNAME: ${MQ_USER:-mov}
+      RABBITMQ_PASSWORD: ${MQ_PASSWORD:-password}
+      QUARKUS_MONGODB_DATABASE: ${DB_NAME:-movDB}
+      QUARKUS_MONGODB_CREDENTIALS_USERNAME: ${DB_USER_NAME:-mov}
+      QUARKUS_MONGODB_CREDENTIALS_PASSWORD: ${DB_USER_PASSWORD:-password}
+      QUARKUS_MONGODB_HOSTS: mongo:${MONGO_PORT:-27017}
+      MOV_URL: http://localhost:${MOV_UI_PORT:-8083}
+
+networks:
+  c0_email_actuator_dev:

@@ -1,0 +1,314 @@
+asyncapi: '2.6.0'
+info:
+ title: C0 E-mail actuator API
+ version: '1.0.0'
+ description: |
+  This VALAWAI component send email-s received from other components.
+ license:
+  name: GNU General Public License version 3
+  url: https://opensource.org/license/gpl-3-0/
+ contact:
+  name: VALAWAI
+  url: https://valawai.eu/
+
+channels:
+  valawai/c0/email_actuator/data/e_mail:
+    description:  Notify this component about the e-mails to send.
+    subscribe:
+      message:
+        $ref: '#/components/messages/received_e_mail'
+
+  valawai/c0/email_actuator/control/registered:
+    description: Notify this component when it has been registered.
+    subscribe:
+      message:
+        $ref: '#/components/messages/registered_component'
+
+components:
+  messages:
+    received_e_mail:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/e_mail_payload'
+        
+    registered_component:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/component_payload'
+
+
+  schemas:
+    e_mail_payload:
+      description: The payload that contains the information of an e-mail.
+      type: object
+      properties:
+        address:
+          type: array
+          description: The e-mail subject.
+          items:
+            - $ref: '#/components/schemas/e_mail_address_payload'
+          examples:
+           - [{"type":"FROM","name":"Jane doe","address":"jane.doe@valawai.eu"},{"type":"TO","address":"info@valawai.eu"}]
+        subject:
+          type: string
+          description: The e-mail subject.
+          examples:
+           - How to publish a component?
+        is_html:
+          type: boolean
+          description: This is true if the e-mail content is HTML.
+          default: false
+          examples:
+           - true
+        content:
+          type: string
+          description: The content of the e-mail.
+          examples:
+           - Hi! Could you please inform me about the necessary steps to have a component available in the VALAWAI? 
+          
+    e_mail_address_payload:
+      description: Describe the address associated with an e-mail.
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of address.
+          enum:
+            - TO
+            - CC
+            - BCC
+          examples:
+           - TO
+        name:
+          type: string
+          description: The name of the user.
+          examples:
+           - VALAWAI
+        address:
+          type: string
+          description: The e-mail address.
+          examples:
+           - no-reply@valawai.eu
+          
+    component_payload:
+      type: object
+      properties:
+        id:
+          description: The identifier of the component.
+          type: string
+          pattern: '[0-9a-fA-F]{24}'
+          examples: 
+            - '65c1f59ea4cb169f42f5edc4'
+        name:
+          description: The name of the component.
+          type: string
+          examples: 
+            - 'c0_voice_to_text'
+        description:
+          description: The description of the component.
+          type: string
+          examples: 
+            - 'Generate text from the ambient audio'
+        version:
+          description: The component version.
+          type: string
+          pattern: '\d+\.\d+\.\d+'
+          examples: 
+            - '1.0.5'
+        api_version:
+          description: The version of the component API.
+          type: string
+          pattern: '\d+\.\d+\.\d+'
+          examples: 
+            - '2.3.0'
+        type:
+          description: The type level of the component in the VALAWAI.
+          oneOf:
+            - $ref: '#/components/schemas/component_type'
+        since:
+          description: The epoch time, in seconds, since the component is available in VALAWAI.
+          type: integer
+          minimum: 0
+          examples: 
+            - '1709902001'
+        channels:
+          description: The channels that the component has.
+          type: array
+          items:
+            - $ref: '#/components/schemas/channel_schema'
+
+    component_type:
+      type: string
+      enum:
+        - 'C0'
+        - 'C1'
+        - 'C2'
+
+    channel_schema:
+      type: object
+      description: A schema that defines the messages that a channel can receive or send.
+      properties:
+        id:
+          description: The identifier of the channel.
+          type: string
+          examples: 
+            - 'valawai/c0/voice_to_text/data/audio'
+        description:
+          description: The description of the channel.
+          type: string
+          examples: 
+            - 'Provide the audio to convert to text'
+        subscribe:
+          description: The type of payload that the channel can receive.
+          oneOf:
+            - $ref: '#/components/schemas/payload_schema'
+        publish:
+          description: The type of payload that the channel can send.
+          oneOf:
+            - $ref: '#/components/schemas/payload_schema'
+
+    payload_schema:
+      type: object
+      discriminator: type
+      properties:
+        type:
+          type: string
+          enum:
+            - BASIC
+            - ENUM
+            - OBJECT
+            - ARRAY
+            - CONST
+            - REF
+            - ONE_OF
+            - ANY_OF
+            - ALL_OF
+      required:
+        - type
+
+    basic_payload_schema:
+      description: The basic payload schema.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'BASIC'
+            format:
+              type: string
+              description: The format of the basic type.
+              enum:
+                - 'INTEGER'
+                - 'NUMBER'
+                - 'BOOLEAN'
+                - 'STRING'
+
+    enum_payload_schema:
+      description: A payload that is defined as one value of a set.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'ENUM'
+            values:
+              type: array
+              description: The possible enum values.
+              items:
+                - type: string
+
+    object_payload_schema:
+      description: A definition of a schema that describes an object.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'OBJECT'
+            id:
+              type: integer
+              description: The identifier used when this scheme is referred to by other components.
+            properties:
+              description: The properties that define the object.
+              additionalProperties:
+                $ref: '#/components/schemas/payload_schema'
+            
+    array_payload_schema:
+      description: A payload that is represented by an array of values.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'ARRAY'
+            items:
+              description: The type for the elements on the array.
+              type: array
+              items:
+                - $ref: '#/components/schemas/payload_schema'
+
+    constant_payload_schema:
+      description: A payload that is a constant value.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'CONST'
+            value:
+              type: string
+              description: The constant of the schema.
+
+    reference_payload_schema:
+      description: A payload that is a reference to another schema.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'REF'
+            value:
+              type: integer
+              description: The identifier of the schema that this a reference.
+
+    one_of_payload_schema:
+      description: A payload that is one of the possible schemas.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'ONE_OF'
+            items:
+              description: The possible schemas.
+              type: array
+              items:
+                - $ref: '#/components/schemas/payload_schema'
+
+    any_of_payload_schema:
+      description: A payload that is any of the possible schemas.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'ANY_OF'
+            items:
+              description: The possible schemas.
+              type: array
+              items:
+                - $ref: '#/components/schemas/payload_schema'
+
+    all_of_payload_schema:
+      description: A payload that is a set of schemas.
+      allOf:
+        - $ref: '#/components/schemas/payload_schema'
+        - type: object
+          properties:
+            type:
+              const: 'ALL_OF'
+            items:
+              description: The schemas that has to match.
+              type: array
+              items:
+                - $ref: '#/components/schemas/payload_schema'
