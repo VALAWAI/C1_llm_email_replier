@@ -16,7 +16,7 @@
 
 from setuptools import setup, find_packages
 setup(
-    name='C1 LLM E-Mail replier',
+    name='C1_LLM_ E_Mail_replier',
     version='1.0.0',
     packages=find_packages(include=['C1_llm_email_replier', 'C1_llm_email_replier.*']),
     install_requires=[

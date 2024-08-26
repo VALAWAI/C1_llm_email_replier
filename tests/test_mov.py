@@ -19,20 +19,20 @@ import unittest
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from C1_llm_email_replier.email_replier_generator import EMailReplierGenerator
+from C1_llm_email_replier.mov import MOV
 
-class TestEMailReplierGenerator(unittest.TestCase):
-    """Class to test the e-mail replier generator
+class TestMOV(unittest.TestCase):
+    """Class to test the interaction with the Master Of VALAWAI (MOV)
     """
     
     def setUp(self):
-        """Create the generator.
+        """Create the mov.
         """
-        self.generator = EMailReplierGenerator()
+        self.mov = MOV()
     
     def test_generate_reply(self):
         """Test the reply generation
         """
-        reply = self.generator.generate_reply(subject="The buzzerr 316 not work more",content="Hi!\nI buy the buzzerr 316 and after some days it does not work more. The serial number is 123dfr567. Is it any issue with it? Do I need to replace? Is it a refund possible?")
-        assert len(reply)>100
+        reply = self.mov.register_component()
+        assert len(reply)==0
  
