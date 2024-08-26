@@ -22,7 +22,8 @@ setup(
     install_requires=[
         'torch>=2.4.0',
         'transformers>=4.44.2',
-        'accelerate>=0.33.0'
+        'accelerate>=0.33.0',
+        'pika>=1.3.2'
     ],
     setup_requires=['pytest-runner'],
     tests_require=['pytest']

@@ -19,24 +19,38 @@ import unittest
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from C1_llm_email_replier.mov import MOV
 from C1_llm_email_replier.message_service import MessageService
 import re
+import time
 
-class TestMOV(unittest.TestCase):
-    """Class to test the interaction with the Master Of VALAWAI (MOV)
+class TestMessageService(unittest.TestCase):
+    """Class to test the service to interact with the rabbitMQ
     """
     
     def setUp(self):
-        """Create the mov.
+        """Create the message service.
         """
         self.message_service=MessageService(host='host.docker.internal',username='mov',password='password')
-        self.mov = MOV(self.message_service)
+
     
-    def test_register_component_msg(self):
-        """Test the creation of the message to register the component
+    def test_should_not_initilize_to_an_undefined_server(self):
+        """Test that can not register to an undefined server
         """
-        msg = self.mov.register_component_msg()
-        assert re.match(r'\d+\.\d+\.\d+', msg['version'])
-        assert len(msg['asyncapi_yaml'])>100
- 
+        
+        error=None
+        before_test=int(time.time())
+        retry_sleep_seconds=1
+        max_retries=3
+        try:
+
+            MessageService(host='undefined',max_retries=max_retries,retry_sleep_seconds=retry_sleep_seconds)
+            
+        except Exception as e:
+            # Ignored
+            error=e
+
+        after_test=int(time.time())
+        assert error != None
+        expected_test_time=before_test+retry_sleep_seconds*max_retries
+        assert  abs(expected_test_time-after_test) <= retry_sleep_seconds
+        

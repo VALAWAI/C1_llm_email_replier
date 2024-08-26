@@ -18,34 +18,34 @@
 import sys
 import os.path
 import re
+from .message_service import MessageService
 
 
 class MOV(object):
     """The component used to interatc with the Master Of VALAWAI (MOV)
     """
     
-    def __init__(self):
+    def __init__(self, message_service:MessageService):
         """Initialize the connection to the MOV
         """
+        self.message_service = message_service
     
-    def __read_file(self,path:str):
+    def __read_file(self, path:str):
         """Read a file and return its content.
         """
-        class_file_path=os.path.abspath(os.path.dirname(__file__))
-        file_path=os.path.join(class_file_path, path)
-        with open(file_path,'r') as file:
+        class_file_path = os.path.abspath(os.path.dirname(__file__))
+        file_path = os.path.join(class_file_path, path)
+        with open(file_path, 'r') as file:
             content = file.read()
         return content
-
         
-        
-    def register_component(self):
+    def register_component_msg(self):
         """Register this component into the MOV (https://valawai.github.io/docs/tutorials/mov#register-a-component)
         """
         
-        setup=self.__read_file('../setup.py')
-        version=re.findall(r"version='(\d+\.\d+\.\d+)'",setup)[0]
-        async_api=self.__read_file('../asyncapi.yaml')
+        setup = self.__read_file('../setup.py')
+        version = re.findall(r"version='(\d+\.\d+\.\d+)'", setup)[0]
+        async_api = self.__read_file('../asyncapi.yaml')
              
         msg = {
             "type": "C1",
