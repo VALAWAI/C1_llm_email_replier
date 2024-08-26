@@ -132,6 +132,8 @@ You can start the development environment with the script:
 
 TO DO
 
+* **testAll** to runing all all the tests
+
 Also, this starts the tools:
 
  * **RabbitMQ**  the server to manage the messages to interchange with the components.

@@ -58,11 +58,11 @@ else
 	DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS -f docker/dev/Dockerfile -t valawai/c1_llm_email_replier:dev .
 	if [ $? -eq 0 ]; then
 		docker compose -f docker/dev/docker-compose.yml up -d
-		DOCKER_PARAMS="--rm --name c1_llm_email_replier_dev --add-host=host.docker.internal:host-gateway -v /var/run/docker.sock:/var/run/docker.sock -p 5005:5005 -p 8080:8080 -p 4200:4200 -it"
+		DOCKER_PARAMS="--rm --name c1_llm_email_replier_dev --add-host=host.docker.internal:host-gateway -v /var/run/docker.sock:/var/run/docker.sock -it"
 		if [[ "$OSTYPE" == "darwin"* ]]; then
 			DOCKER_PARAMS="$DOCKER_PARAMS -e TESTCONTAINERS_HOST_OVERRIDE=docker.for.mac.host.internal"
 		fi
-		docker run $DOCKER_PARAMS -v "${HOME}/.m2":/root/.m2  -v "${PWD}":/app valawai/c1_llm_email_replier:dev /bin/bash
+		docker run $DOCKER_PARAMS -v "${PWD}":/app valawai/c1_llm_email_replier:dev /bin/bash
 		./stopDevelopmentEnvironment.sh
 	fi
 	popd >/dev/null
