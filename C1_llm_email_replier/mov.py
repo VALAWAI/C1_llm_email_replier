@@ -30,7 +30,7 @@ class MOV(object):
         """Initialize the connection to the MOV
         """
         self.message_service = message_service
-        self.registered_id = None
+        self.component_id = None
         self.message_service.listen_for('valawai/c1/llm_email_replier/control/registered',self.registered_component)
     
     def __read_file(self, path:str):
@@ -65,10 +65,18 @@ class MOV(object):
         msg = self.register_component_msg()
         self.message_service.publish_to('valawai/component/register',msg)
         
-    def registered_component(self, ch, method, properties, msg):
+    def registered_component(self, ch, method, properties, body):
         """Called when the component has been registered.
         """
-        logging.debug("Received registered component:"+body)
-        msg=json.decoder(body)
-        self.registered_id=msg['id']
+        logging.debug("Received registered component %s",body)
+        msg=json.loads(body)
+        self.component_id=msg['id']
     
+    def unregister_component(self):
+        """Unregister this component from the MOV (https://valawai.github.io/docs/tutorials/mov/#unregister-a-component)
+        """
+        if self.component_id != None:
+            
+            msg = {"component_id":self.component_id}
+            self.message_service.publish_to('valawai/component/unregister',msg)
+            self.component_id = None
