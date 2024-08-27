@@ -22,6 +22,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from C1_llm_email_replier.mov import MOV
 from C1_llm_email_replier.message_service import MessageService
 import re
+import time
+import logging
+
 
 class TestMOV(unittest.TestCase):
     """Class to test the interaction with the Master Of VALAWAI (MOV)
@@ -32,6 +35,11 @@ class TestMOV(unittest.TestCase):
         """
         self.message_service=MessageService(host='host.docker.internal',username='mov',password='password')
         self.mov = MOV(self.message_service)
+        
+    def tearDown(self):
+        """Stops the message service.
+        """
+        self.message_service.close()
     
     def test_register_component_msg(self):
         """Test the creation of the message to register the component
@@ -40,3 +48,17 @@ class TestMOV(unittest.TestCase):
         assert re.match(r'\d+\.\d+\.\d+', msg['version'])
         assert len(msg['asyncapi_yaml'])>100
  
+    def test_register_component(self):
+        """Test the register of the component
+        """
+        self.message_service.start_consuming_and_forget()
+        self.mov.register_component()
+        
+        for i in range(10):
+            
+            if self.mov.registered_id != None:
+                break
+            
+            time.sleep(1)
+        
+        assert self.mov.registered_id != None

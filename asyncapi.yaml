@@ -1,9 +1,9 @@
 asyncapi: '2.6.0'
 info:
- title: C0 E-mail actuator API
+ title: C1 LLM E-mail replier API
  version: '1.0.0'
  description: |
-  This VALAWAI component send email-s received from other components.
+  This VALAWAI component that generates a reply for a received e-mail.
  license:
   name: GNU General Public License version 3
   url: https://opensource.org/license/gpl-3-0/
@@ -12,13 +12,13 @@ info:
   url: https://valawai.eu/
 
 channels:
-  valawai/c0/email_actuator/data/e_mail:
-    description:  Notify this component about the e-mails to send.
-    subscribe:
+  valawai/c1/llm_email_replier/data/reply_e_mail:
+    description:  Publish the reply of the received e-mail.
+    publish:
       message:
-        $ref: '#/components/messages/received_e_mail'
+        $ref: '#/components/messages/reply_e_mail'
 
-  valawai/c0/email_actuator/control/registered:
+  valawai/c1/llm_email_replier/control/registered:
     description: Notify this component when it has been registered.
     subscribe:
       message:
@@ -26,10 +26,10 @@ channels:
 
 components:
   messages:
-    received_e_mail:
+    reply_e_mail:
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/e_mail_payload'
+        $ref: '#/components/schemas/reply_e_mail_payload'
         
     registered_component:
       contentType: application/json
@@ -38,8 +38,8 @@ components:
 
 
   schemas:
-    e_mail_payload:
-      description: The payload that contains the information of an e-mail.
+    reply_e_mail_payload:
+      description: The payload that contains the information of a reply e-mail.
       type: object
       properties:
         address:

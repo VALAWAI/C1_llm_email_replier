@@ -51,7 +51,7 @@ services:
       - mongo
       - mq
     ports:
-      - ${MOV_UI_PORT:-8084}:8080
+      - ${MOV_UI_PORT:-8083}:8080
     networks:  
       - c0_email_actuator_dev
     environment:

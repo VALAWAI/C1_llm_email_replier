@@ -19,7 +19,8 @@ import sys
 import os.path
 import re
 from .message_service import MessageService
-
+import json
+import logging
 
 class MOV(object):
     """The component used to interatc with the Master Of VALAWAI (MOV)
@@ -29,6 +30,8 @@ class MOV(object):
         """Initialize the connection to the MOV
         """
         self.message_service = message_service
+        self.registered_id = None
+        self.message_service.listen_for('valawai/c1/llm_email_replier/control/registered',self.registered_component)
     
     def __read_file(self, path:str):
         """Read a file and return its content.
@@ -40,7 +43,7 @@ class MOV(object):
         return content
         
     def register_component_msg(self):
-        """Register this component into the MOV (https://valawai.github.io/docs/tutorials/mov#register-a-component)
+        """The message to register this component into the MOV (https://valawai.github.io/docs/tutorials/mov#register-a-component)
         """
         
         setup = self.__read_file('../setup.py')
@@ -54,3 +57,18 @@ class MOV(object):
             "asyncapi_yaml":async_api
             }
         return msg
+
+    def register_component(self):
+        """Register this component into the MOV (https://valawai.github.io/docs/tutorials/mov#register-a-component)
+        """
+        
+        msg = self.register_component_msg()
+        self.message_service.publish_to('valawai/component/register',msg)
+        
+    def registered_component(self, ch, method, properties, msg):
+        """Called when the component has been registered.
+        """
+        logging.debug("Received registered component:"+body)
+        msg=json.decoder(body)
+        self.registered_id=msg['id']
+    
