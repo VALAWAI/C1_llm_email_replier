@@ -35,7 +35,26 @@ class MessageService(object):
                  ):
         """Initialize the connection to the RabbitMQ
         
-        
+        Parameters
+        ----------
+        host : str
+            The RabbitMQ server host name. By default uses the environment variable RABBITMQ_HOST
+            and if it is not defined uses 'mov-mq'.
+        port : int
+            The RabbitMQ server port. By default uses the environment variable RABBITMQ_PORT
+            and if it is not defined uses '5672'.
+        username : str
+            The user name of the credential to connect to the RabbitMQ serve. By default uses the environment
+            variable RABBITMQ_USERNAME and if it is not defined uses 'mov'.
+        password : str
+            The password of the credential to connect to the RabbitMQ serve. By default uses the environment
+            variable RABBITMQ_PASSWORD and if it is not defined uses 'password'.
+        max_retries : int
+            The number maximum of tries to create a connection with the RabbitMQ server. By default uses
+            the environment variable RABBITMQ_MAX_RETRIES and if it is not defined uses '100'.
+        retry_sleep_seconds : int
+            The seconds to wait between the tries for create a connection with the RabbitMQ server.
+            By default uses the environment variable RABBITMQ_RETRY_SLEEP and if it is not defined uses '3'.
         """
         
         tries=0
