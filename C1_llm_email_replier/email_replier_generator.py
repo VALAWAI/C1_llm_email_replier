@@ -18,7 +18,7 @@
 
 import torch
 from transformers import pipeline
-
+import os
 
 class EMailReplierGenerator(object):
     """The component that generates a reply to an e-mail using LLM.
@@ -27,11 +27,11 @@ class EMailReplierGenerator(object):
     
     def __init__(self,
                  model:str="HuggingFaceH4/zephyr-7b-beta",
-                 max_new_tokens:int=256,
-                 temperature:float=0.7,
-                 top_k:float=50,
-                 top_p:float=0.95,
-                 system_prompt:str="You are a polite chatbot who always try to provide solutions to the customers problems",
+                 max_new_tokens:int=int(os.getenv('REPLY_MAX_NEW_TOKENS',"256")),
+                 temperature:float=float(os.getenv('REPLY_TEMPERATURE',"0.7")),
+                 top_k:int=int(os.getenv('REPLY_TOP_K',"50")),
+                 top_p:float=float(os.getenv('REPLY_TOP_P',"0.95")),
+                 system_prompt:str=os.getenv('REPLY_SYSTEM_PROMPT',"You are a polite chatbot who always try to provide solutions to the customers problems"),
                  user_prompt:str="Reply to an e-mail with the subject '{subject}' and the content '{content}'"
                  ):
         """Initialize the replier generator
@@ -41,15 +41,20 @@ class EMailReplierGenerator(object):
         model : str
             The LLM model name (https://huggingface.co)
         max_new_tokens : int
-            The number maximum of tokens to generate
+            The number maximum of tokens to generate. By default get the environment variable
+            REPLY_MAX_NEW_TOKENS and if it not defined use 256.
         temperature: float
-            The value used to modulate the next token probabilities.
-        top_k: float
-            The number of highest probability tokens to consider for generating the output.
+            The value used to modulate the next token probabilities. By default get the environment variable
+            REPLY_TEMPERATURE and if it not defined use 0.7.
+        top_k: int
+            The number of highest probability tokens to consider for generating the output. By default get the environment variable
+            REPLY_TOP_K and if it not defined use 50.
         top_p: float
-            A probability threshold for generating the output, using nucleus filtering.
+            A probability threshold for generating the output, using nucleus filtering. By default get the environment variable
+            REPLY_TOP_P and if it not defined use 0.95.
         system_prompt: str
-            The prompt to use as system. It is used to define how the reply must be done.
+            The prompt to use as system. It is used to define how the reply must be done. By default get the environment variable
+            REPLY_SYSTEM_PROMPT and if it not defined use 'You are a polite chatbot who always try to provide solutions to the customers problems'.
         user_prompt: str
             The prompt used to pass the e-mial information to generate the reply.
         """
@@ -76,6 +81,8 @@ class EMailReplierGenerator(object):
         Returns
         -------
         str
+            The subject of the reply message
+        str
             The content of the reply message
         """
         messages = [
@@ -91,6 +98,16 @@ class EMailReplierGenerator(object):
         prompt = self.pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         outputs = self.pipe(prompt, max_new_tokens=self.max_new_tokens, do_sample=True, temperature=self.temperature, top_k=self.top_k, top_p=self.top_p)
         
-        return outputs[0]["generated_text"]
+        reply = outputs[0]["generated_text"]
+        reply_subject = f"Re: {subject}"
+        
+        index = reply.index('<|assistant|>')+len('<|assistant|>')
+        reply_content = reply[index:].strip()
+        if reply_content.startswith('Subject:'):
+            index = reply_content.index('\n')
+            reply_subject = reply_content[len('Subject:'):index].strip()
+            reply_content = reply_content[index+1:].strip()
+            
+        return reply_subject, reply_content 
 
         

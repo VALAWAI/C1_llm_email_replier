@@ -18,6 +18,13 @@ channels:
       message:
         $ref: '#/components/messages/reply_e_mail'
 
+  valawai/c1/llm_email_replier/data/received_e_mail:
+    description: Receive the e-mail to create a reply.
+    subscribe:
+      message:
+        $ref: '#/components/messages/received_e_mail'
+
+
   valawai/c1/llm_email_replier/control/registered:
     description: Notify this component when it has been registered.
     subscribe:
@@ -31,6 +38,11 @@ components:
       payload:
         $ref: '#/components/schemas/reply_e_mail_payload'
         
+    received_e_mail:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/received_e_mail_payload'
+
     registered_component:
       contentType: application/json
       payload:
@@ -46,7 +58,7 @@ components:
           type: array
           description: The e-mail subject.
           items:
-            - $ref: '#/components/schemas/e_mail_address_payload'
+            - $ref: '#/components/schemas/reply_e_mail_address_payload'
           examples:
            - [{"type":"FROM","name":"Jane doe","address":"jane.doe@valawai.eu"},{"type":"TO","address":"info@valawai.eu"}]
         subject:
@@ -65,8 +77,8 @@ components:
           description: The content of the e-mail.
           examples:
            - Hi! Could you please inform me about the necessary steps to have a component available in the VALAWAI? 
-          
-    e_mail_address_payload:
+
+    reply_e_mail_address_payload:
       description: Describe the address associated with an e-mail.
       type: object
       properties:
@@ -79,6 +91,64 @@ components:
             - BCC
           examples:
            - TO
+        name:
+          type: string
+          description: The name of the user.
+          examples:
+           - VALAWAI
+        address:
+          type: string
+          description: The e-mail address.
+          examples:
+           - no-reply@valawai.eu
+
+          
+    received_e_mail_payload:
+      description: The payload that contains the information of an e-mail.
+      type: object
+      properties:
+        address:
+          type: array
+          description: The e-mail subject.
+          items:
+            - $ref: '#/components/schemas/receive_e_mail_address_payload'
+          examples:
+           - [{"type":"FROM","name":"Jane doe","address":"jane.doe@valawai.eu"},{"type":"TO","address":"info@valawai.eu"}]
+        subject:
+          type: string
+          description: The e-mail subject.
+          examples:
+           - How to publish a component?
+        mime_type:
+          type: string
+          description: The MIME type associated with the e-mail content.
+          examples:
+           - text/plain
+        content:
+          type: string
+          description: The content of the e-mail.
+          examples:
+           - Hi! Could you please inform me about the necessary steps to have a component available in the VALAWAI? 
+        received_at:
+          type: integer
+          description: The epoch time, in seconds, when the email is received.
+          examples:
+           - 1715342664
+
+    receive_e_mail_address_payload:
+      description: Describe the address associated with an e-mail.
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of address.
+          enum:
+            - FROM
+            - TO
+            - CC
+            - BCC
+          examples:
+           - FROM
         name:
           type: string
           description: The name of the user.

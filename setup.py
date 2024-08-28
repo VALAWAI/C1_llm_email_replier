@@ -23,7 +23,8 @@ setup(
         'torch>=2.4.0',
         'transformers>=4.44.2',
         'accelerate>=0.33.0',
-        'pika>=1.3.2'
+        'pika>=1.3.2',
+        'html2text>=2024.2.26'
     ],
     setup_requires=['pytest-runner'],
     tests_require=['pytest']

@@ -33,6 +33,7 @@ class TestEMailReplierGenerator(unittest.TestCase):
     def test_generate_reply(self):
         """Test the reply generation
         """
-        reply = self.generator.generate_reply(subject="The buzzerr 316 not work more",content="Hi!\nI buy the buzzerr 316 and after some days it does not work more. The serial number is 123dfr567. Is it any issue with it? Do I need to replace? Is it a refund possible?")
-        assert len(reply)>100
+        subject,reply = self.generator.generate_reply(subject="The buzzerr 316 not work more",content="Hi!\nI buy the buzzerr 316 and after some days it does not work more. The serial number is 123dfr567. Is it any issue with it? Do I need to replace? Is it a refund possible?")
+        self.assertGreater(len(subject),3,"Must return the subject")
+        self.assertGreater(len(reply),0,"Must return the reply content")
  

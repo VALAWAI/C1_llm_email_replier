@@ -28,6 +28,12 @@ class MOV(object):
     
     def __init__(self, message_service:MessageService):
         """Initialize the connection to the MOV
+        
+        Parameters
+        ----------
+        message_service : MessageService
+            The service to receive or send messages thought RabbitMQ
+
         """
         self.message_service = message_service
         self.component_id = None
@@ -67,6 +73,15 @@ class MOV(object):
         
     def registered_component(self, ch, method, properties, body):
         """Called when the component has been registered.
+
+        Parameters
+        ----------
+        ch : MessageService
+            The service to receive or send messages thought RabbitMQ
+        ch : MessageService
+            The service to receive or send messages thought RabbitMQ
+        ch : MessageService
+            The service to receive or send messages thought RabbitMQ
         """
         logging.debug("Received registered component %s",body)
         msg=json.loads(body)
