@@ -80,3 +80,84 @@ class MOV(object):
             msg = {"component_id":self.component_id}
             self.message_service.publish_to('valawai/component/unregister',msg)
             self.component_id = None
+
+    def debug(self,msg:str,payload=None):
+        """Send a debug log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
+        
+        Parameters
+        ----------
+        msg : str
+            The log message
+        payload: object
+            The payload associated to the log message.
+        """
+        self.__log('DEBUG',msg,payload)
+        logging.debug(msg)
+
+    def info(self,msg:str,payload=None):
+        """Send a info log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
+        
+        Parameters
+        ----------
+        msg : str
+            The log message
+        payload: object
+            The payload associated to the log message.
+        """
+        self.__log('INFO',msg,payload)
+        logging.info(msg)
+
+    def warn(self,msg:str,payload=None):
+        """Send a warn log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
+        
+        Parameters
+        ----------
+        msg : str
+            The log message
+        payload: object
+            The payload associated to the log message.
+        """
+        self.__log('WARN',msg,payload)
+        logging.warn(msg)
+
+    def error(self,msg:str,payload=None):
+        """Send a error log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
+        
+        Parameters
+        ----------
+        msg : str
+            The log message
+        payload: object
+            The payload associated to the log message.
+        """
+        self.__log('ERROR',msg,payload)
+        logging.error(msg)
+
+    def __log(self,level:str,msg:str,payload=None):
+        """Send a log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
+        
+        Parameters
+        ----------
+        level : str
+            The log level
+        msg : str
+            The log message
+        payload: object
+            The payload associated to the log message.
+        """
+
+        msg = {
+            "level":level,
+            "message": msg
+        }
+        
+        if payload != None:
+            
+            msg["payload"] = json.dumps(payload)
+            
+        if self.component_id != None:
+            
+            msg["component_id"] = self.component_id
+        
+        self.message_service.publish_to('valawai/log/add',msg)
+        
