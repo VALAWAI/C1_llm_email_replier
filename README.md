@@ -45,6 +45,25 @@ The most useful environment variables on the docker image are:
  The default value is **mov**.
  - **RABBITMQ_PASSWORD** is the password used to authenticate the user who can access the RabbitMQ.
  The default value is **password**.
+ - **RABBITMQ_MAX_RETRIES** 100
+ - **RABBITMQ_RETRY_SLEEP** 3
+ - **REPLY_MAX_NEW_TOKENS** The number maximum of tokens to generate. The default value is **256**.
+ - **REPLY_TEMPERATURE** The value used to modulate the next token probabilities. The default value is **0.7**.
+ - **REPLY_TOP_K** The number of highest probability tokens to consider for generating the output.
+ The default value is **50**.
+ - **REPLY_TOP_P** A probability threshold for generating the output, using nucleus filtering.
+ The default value is **0.95**.
+ - **REPLY_SYSTEM_PROMPT** The prompt to use as system. It is used to define how the reply must be done. 
+ The default value is **You are a polite chatbot who always try to provide solutions to the customers problems**.
+ - **LOG_CONSOLE_LEVEL** defines the level of the log messages to be show in the console.
+ The possible values are: CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **INFO**.
+ - **LOG_FILE_LEVEL** defines the level of the log messages to be stored in the log file.
+ The possible values are: CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **DEBUG**.
+ - **LOG_FILE_MAX_BYTES** defines the maximum number of bytes that the log file can have before rolling.
+  The default value is **1000000**.
+ - **LOG_FILE_BACKUP_COUNT** defines the maximum number of rolling files to mantain.
+  The default value is **5**.
+
 
 ## Deploy
 
@@ -110,6 +129,17 @@ The defined variables are:
  The default value is **latest**.
  - **MOV_UI_PORT** is the port where the MOV user interface is available.
  The default value is **8080**.
+ - **REPLY_MAX_NEW_TOKENS** The number maximum of tokens to generate. The default value is **256**.
+ - **REPLY_TEMPERATURE** The value used to modulate the next token probabilities. The default value is **0.7**.
+ - **REPLY_TOP_K** The number of highest probability tokens to consider for generating the output.
+ The default value is **50**.
+ - **REPLY_TOP_P** A probability threshold for generating the output, using nucleus filtering.
+ The default value is **0.95**.
+ - **REPLY_SYSTEM_PROMPT** The prompt to use as system. It is used to define how the reply must be done. 
+ The default value is **You are a polite chatbot who always try to provide solutions to the customers problems**.
+ - **LOG_LEVEL** defines the level of the log messages to be show in the console.
+ The possible values are: CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **INFO**.
+
 
 The database is only created the first time where script is called. So, if you modify
 any of the database parameters you must create again the database. For this, you must

@@ -2,6 +2,7 @@
 FROM python:3.9.19-bullseye
 
 ARG LLM_MODEL=HuggingFaceH4/zephyr-7b-beta
+ENV RABBITMQ_HOST=host.docker.internal
 
 RUN apt-get -qy update && \
     apt-get -qy full-upgrade && \

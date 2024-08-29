@@ -13,6 +13,12 @@ services:
       RABBITMQ_PORT: ${MQ_PORT:-5672}
       RABBITMQ_USERNAME: ${MQ_USER:-mov}
       RABBITMQ_PASSWORD: ${MQ_PASSWORD:-password}
+      REPLY_MAX_NEW_TOKENS: ${REPLY_MAX_NEW_TOKENS:-256}
+      REPLY_TEMPERATURE: ${REPLY_TEMPERATURE:-0.7}
+      REPLY_TOP_K: ${REPLY_TOP_K:-50}
+      REPLY_TOP_P: ${REPLY_TOP_P:-0.95}
+      REPLY_SYSTEM_PROMPT: ${REPLY_SYSTEM_PROMPT:-"You are a polite chatbot who always try to provide solutions to the customers problems"}
+      LOG_CONSOLE_LEVEL: ${LOG_LEVEL:-INFO}
 
   mq:
     image: rabbitmq:${RABBITMQ_TAG:-management}
