@@ -39,7 +39,7 @@ class TestReceivedEMailHandler(unittest.TestCase):
     def setUp(self):
         """Create the handler.
         """
-        self.message_service = MessageService(host='host.docker.internal', username='mov', password='password')
+        self.message_service = MessageService()
         self.mov = MOV(self.message_service)
         self.msgs = []
         self.handler = ReceivedEMailHandler(self.message_service, self.mov)

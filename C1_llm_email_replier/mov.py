@@ -18,7 +18,7 @@
 import sys
 import os.path
 import re
-from .message_service import MessageService
+from message_service import MessageService
 import json
 import logging
 

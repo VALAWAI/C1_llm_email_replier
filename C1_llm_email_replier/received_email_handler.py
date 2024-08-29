@@ -16,9 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from .message_service import MessageService
-from .mov import MOV
-from .email_replier_generator import EMailReplierGenerator
+from message_service import MessageService
+from mov import MOV
+from email_replier_generator import EMailReplierGenerator
 import logging
 import json
 import html2text

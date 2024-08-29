@@ -32,7 +32,7 @@ class TestMessageService(unittest.TestCase):
     def setUp(self):
         """Create the message service.
         """
-        self.message_service=MessageService(host='host.docker.internal',username='mov',password='password')
+        self.message_service=MessageService()
 
     def tearDown(self):
         """Stops the message service.
