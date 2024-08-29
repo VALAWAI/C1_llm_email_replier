@@ -24,7 +24,7 @@ import json
 import html2text
 
 class ReceivedEMailHandler(object):
-    """The component that handel the messages with the e-mails to reply.
+    """The component that handle the messages with the e-mails to reply.
     """
     
     def __init__(self,message_service:MessageService,mov:MOV):
@@ -36,8 +36,6 @@ class ReceivedEMailHandler(object):
             The service to receive or send messages thought RabbitMQ
         mov : MOV
             The service to interact with the MOV
-        generator: EMailReplierGenerator
-
         """
         self.message_service = message_service
         self.mov = mov

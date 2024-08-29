@@ -24,12 +24,17 @@ channels:
       message:
         $ref: '#/components/messages/received_e_mail'
 
-
   valawai/c1/llm_email_replier/control/registered:
     description: Notify this component when it has been registered.
     subscribe:
       message:
         $ref: '#/components/messages/registered_component'
+
+  valawai/c1/llm_email_replier/control/parameters:
+    description: Change the parameters of teh component.
+    subscribe:
+      message:
+        $ref: '#/components/messages/change_parameters'
 
 components:
   messages:
@@ -47,6 +52,12 @@ components:
       contentType: application/json
       payload:
         $ref: '#/components/schemas/component_payload'
+
+    change_parameters:
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/parameters_payload'
+        
 
 
   schemas:
@@ -382,3 +393,43 @@ components:
               type: array
               items:
                 - $ref: '#/components/schemas/payload_schema'
+
+    parameters_payload:
+      description: The parameters that can change the component behaviour
+      type: object
+      properties:
+        max_new_tokens:
+          description: The number maximum of tokens to generate.
+          type: integer
+          minimum: 100
+          maximum: 1000
+          examples:
+            - 256
+        temperature:
+          description: The value used to modulate the next token probabilities.
+          type: number
+          minimum: 0.0
+          maximum: 1.0
+          examples:
+            - 0.7
+        top_k:
+          description: The number of highest probability tokens to consider for generating the output.
+          type: integer
+          minimum: 1
+          maximum: 100
+          examples:
+            - 50
+        top_p:
+          description: The probability threshold for generating the output, using nucleus filtering.
+          type: number
+          minimum: 0.0
+          maximum: 1.0
+          examples:
+            - 0.95
+        system_prompt:
+          description: The prompt to use as system. It is used to define how the reply must be done.
+          type: string
+          minLength: 10
+          maxLength: 10000
+          examples:
+            - "You are a polite chatbot who always try to provide solutions to the customers problems"
