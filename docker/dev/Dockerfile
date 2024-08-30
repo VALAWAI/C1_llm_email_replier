@@ -16,5 +16,6 @@ RUN pip install -e .
 RUN python setup.py test
 
 RUN echo "PS1='\[\033[01;32m\]c1_llm_email_replier@dev\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] \$ '" >> /root/.bashrc
+RUN echo "alias run=\"RABBITMQ_HOST=host.docker.internal python C1_llm_email_replier\"" >> /root/.bashrc
 RUN echo "alias testAll=\"pushd /app;python setup.py test;popd\"" >> /root/.bashrc
 RUN echo "alias test=\"python -m unittest\"" >> /root/.bashrc

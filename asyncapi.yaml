@@ -3,7 +3,7 @@ info:
  title: C1 LLM E-mail replier API
  version: '1.0.0'
  description: |
-  This VALAWAI component that generates a reply for a received e-mail.
+  This VALAWAI component generates a reply for a received e-mail.
  license:
   name: GNU General Public License version 3
   url: https://opensource.org/license/gpl-3-0/
@@ -13,7 +13,7 @@ info:
 
 channels:
   valawai/c1/llm_email_replier/data/reply_e_mail:
-    description:  Publish the reply of the received e-mail.
+    description:  Publish the reply to the received e-mail.
     publish:
       message:
         $ref: '#/components/messages/reply_e_mail'
@@ -25,13 +25,13 @@ channels:
         $ref: '#/components/messages/received_e_mail'
 
   valawai/c1/llm_email_replier/control/registered:
-    description: Notify this component when it has been registered.
+    description: Receive the notification that the component is registered.
     subscribe:
       message:
         $ref: '#/components/messages/registered_component'
 
   valawai/c1/llm_email_replier/control/parameters:
-    description: Change the parameters of teh component.
+    description: Change the parameters of the component.
     subscribe:
       message:
         $ref: '#/components/messages/change_parameters'
@@ -62,7 +62,7 @@ components:
 
   schemas:
     reply_e_mail_payload:
-      description: The payload that contains the information of a reply e-mail.
+      description: The payload with the information of a reply e-mail.
       type: object
       properties:
         address:
@@ -115,7 +115,7 @@ components:
 
           
     received_e_mail_payload:
-      description: The payload that contains the information of an e-mail.
+      description: The payload with the information of a received e-mail.
       type: object
       properties:
         address:
@@ -399,7 +399,7 @@ components:
       type: object
       properties:
         max_new_tokens:
-          description: The number maximum of tokens to generate.
+          description: The maximum number of tokens to generate.
           type: integer
           minimum: 100
           maximum: 1000
@@ -427,9 +427,9 @@ components:
           examples:
             - 0.95
         system_prompt:
-          description: The prompt to use as system. It is used to define how the reply must be done.
+          description: The prompt used to define how the reply must be done.
           type: string
           minLength: 10
           maxLength: 10000
           examples:
-            - "You are a polite chatbot who always try to provide solutions to the customers problems"
+            - "You are a polite chatbot who always tries to provide solutions to the customer's problems"

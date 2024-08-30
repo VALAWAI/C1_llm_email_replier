@@ -1,7 +1,7 @@
 # C1_llm_email_replier
 
-The C1 LLM e-mail replier component receive e-mails from C0 components, generate a reply
-using a large language model (LLM), and send it back to other C0 components to publish it.
+The C1 LLM e-mail replier component receives e-mails from C0 components, generate a reply
+using a large language model (LLM), and sending it back to other C0 components to publish it.
 You can read more about this service and the payload of the message on
 the [aysncapi](asyncapi.yaml) or on the [component documentation](https://valawai.github.io/docs/components/C1/llm_email_replier).
 
@@ -9,7 +9,7 @@ the [aysncapi](asyncapi.yaml) or on the [component documentation](https://valawa
 
  - Type: C1
  - Name: LLM e-mail replier
- - API: [1.0.0 (August 16, 2024)](https://raw.githubusercontent.com/VALAWAI/C1_llm_email_replier/ASYNCAPI_1.0.0/asyncapi.yml)
+ - API: [1.0.0 (August 30, 2024)](https://raw.githubusercontent.com/VALAWAI/C1_llm_email_replier/ASYNCAPI_1.0.0/asyncapi.yml)
  - VALAWAI API: [1.2.0 (March 9, 2024)](https://raw.githubusercontent.com/valawai/MOV/ASYNCAPI_1.2.0/asyncapi.yml)
  - Developed By: [IIIA-CSIC](https://www.iiia.csic.es)
  - License: [GPL 3](LICENSE)
@@ -41,30 +41,30 @@ The most useful environment variables on the docker image are:
  The default value is **mov-mq**.
  - **RABBITMQ_PORT** defines the port of the RabbitMQ.
  The default value is **5672**.
- - **RABBITMQ_USERNAME** contains the user's name that can access the RabbitMQ.
+ - **RABBITMQ_USERNAME** contains the username of the user who can access RabbitMQ.
  The default value is **mov**.
  - **RABBITMQ_PASSWORD** is the password used to authenticate the user who can access the RabbitMQ.
  The default value is **password**.
- - **RABBITMQ_MAX_RETRIES** is the number maximum of tries to connect to the RabbitMQ.
+ - **RABBITMQ_MAX_RETRIES** is the maximum number of tries to connect to the RabbitMQ.
  The default value is **100**
- - **RABBITMQ_RETRY_SLEEP** is the seconds thta the component must wait before to try again to connect with the RabbitMQ.
+ - **RABBITMQ_RETRY_SLEEP** is the seconds to wait before the component tries to connect again with the RabbitMQ.
  The default value is **3**
- - **REPLY_MAX_NEW_TOKENS** The number maximum of tokens to generate. The default value is **256**.
+ - **REPLY_MAX_NEW_TOKENS** The maximum number of tokens to generate. The default value is **256**.
  - **REPLY_TEMPERATURE** The value used to modulate the next token probabilities. The default value is **0.7**.
  - **REPLY_TOP_K** The number of highest probability tokens to consider for generating the output.
  The default value is **50**.
  - **REPLY_TOP_P** A probability threshold for generating the output, using nucleus filtering.
  The default value is **0.95**.
  - **REPLY_SYSTEM_PROMPT** The prompt to use as system. It is used to define how the reply must be done. 
- The default value is **You are a polite chatbot who always try to provide solutions to the customers problems**.
- - **LOG_CONSOLE_LEVEL** defines the level of the log messages to be show in the console.
- The possible values are: CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **INFO**.
+ The default value is **You are a polite chatbot who always tries to provide solutions to the customer's problems**.
+ - **LOG_CONSOLE_LEVEL** defines the level of the log messages to be shown in the console.
+ The possible values are CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **INFO**.
  - **LOG_FILE_LEVEL** defines the level of the log messages to be stored in the log file.
- The possible values are: CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **DEBUG**.
- - **LOG_FILE_MAX_BYTES** defines the maximum number of bytes that the log file can have before rolling.
-  The default value is **1000000**.
- - **LOG_FILE_BACKUP_COUNT** defines the maximum number of rolling files to mantain.
-  The default value is **5**.
+ The possible values are CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **DEBUG**.
+ - **LOG_FILE_MAX_BYTES** defines the maximum number of bytes the log file can have before rolling.
+ The default value is **1000000**.
+ - **LOG_FILE_BACKUP_COUNT** defines the maximum number of rolling files to maintain.
+ The default value is **5**.
 
 
 ## Deploy
@@ -99,13 +99,13 @@ The defined variables are:
 
  - **C1_LLM_EMAIL_REPLIER_TAG** is the tag of the C1 llm e-mail replier docker image to use.
  The default value is **latest**.
- - **MQ_HOST** is the hostname of the message queue broker that is available.
- The default value is **mq**.
+ - **MQ_HOST** is the hostname of the message queue broker to use.
+ The default value is **mq** which is the server started in the compose.
  - **MQ_PORT** is the port of the message queue broker is available.
  The default value is **5672**.
  - **MQ_UI_PORT** is the port of the message queue broker user interface is available.
  The default value is **8081**.
- - **MQ_USER** is the name of the user that can access the message queue broker.
+ - **MQ_USER** is the username that can access the message queue broker.
  The default value is **mov**.
  - **MQ_PASSWORD** is the password used to authenticate the user who can access the message queue broker.
  The default value is **password**.
@@ -121,30 +121,30 @@ The defined variables are:
  The default value is **password**.
  - **MONGO_LOCAL_DATA** is the local directory where the MongoDB will be stored.
  The default value is **~/mongo_data/movDB**.
- - **DB_NAME** is the name of the database used by the MOV.
+ - **DB_NAME** is the database name used by the MOV.
  The default value is **movDB**.
  - **DB_USER_NAME** is the name of the user used by the MOV to access the database.
  The default value is **mov**.
- - **DB_USER_PASSWORD** is the password of the user used by the MOV to access the database.
+ - **DB_USER_PASSWORD** is the user password used by the MOV to access the database.
  The default value is **password**.
  - **MOV_TAG** is the tag of the MOV docker image to use.
  The default value is **latest**.
  - **MOV_UI_PORT** is the port where the MOV user interface is available.
  The default value is **8080**.
- - **REPLY_MAX_NEW_TOKENS** The number maximum of tokens to generate. The default value is **256**.
+ - **REPLY_MAX_NEW_TOKENS** The maximum number of tokens to generate. The default value is **256**.
  - **REPLY_TEMPERATURE** The value used to modulate the next token probabilities. The default value is **0.7**.
  - **REPLY_TOP_K** The number of highest probability tokens to consider for generating the output.
  The default value is **50**.
  - **REPLY_TOP_P** A probability threshold for generating the output, using nucleus filtering.
  The default value is **0.95**.
  - **REPLY_SYSTEM_PROMPT** The prompt to use as system. It is used to define how the reply must be done. 
- The default value is **You are a polite chatbot who always try to provide solutions to the customers problems**.
- - **LOG_LEVEL** defines the level of the log messages to be show in the console.
- The possible values are: CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **INFO**.
+ The default value is **You are a polite chatbot who always tries to provide solutions to the customer's problems**.
+ - **LOG_LEVEL** defines the level of the log messages to be shown in the console.
+ The possible values are CRITICAL, FATAL, ERROR, WARN, WARNING, INFO or DEBUG. The default value is **INFO**.
 
 
-The database is only created the first time where script is called. So, if you modify
-any of the database parameters you must create again the database. For this, you must
+The database is only created the first time that the script is called. So, if you modify
+any of the database parameters you must create the database again. For this, you must
 remove the directory defined by the parameter **MONGO_LOCAL_DATA** and start again
 the **docker compose**.
 
@@ -162,22 +162,26 @@ You can start the development environment with the script:
 ./startDevelopmentEnvironment.sh
 ```
 
-TO DO
+After that, you have a bash shell where you can interact with the Python code. You can use the next command
+to so some common action.
 
-* **testAll** to runing all all the tests
+* **run** to start the component.
+* **testAll** to run all all the tests
+* **test test/test_something.py** to run the tests defined on the file **test_something.py**
+* **test test/test_something.py -k test_do_something** to run the test named **test_do_something** defined on the file **test_something.py**
 
 Also, this starts the tools:
 
- * **RabbitMQ**  the server to manage the messages to interchange with the components.
+ * **RabbitMQ** is the server that manages the message brokers.
  The management web interface can be opened at **http://localhost:8081** with the credential
  **mov**:**password**.
- * **MongoDB**  the database to store the data used by the MOV. The database is named as **movDB** and the user credentials **mov:password**.
+ * **MongoDB** is the database used by the MOV. The database is named **movDB** and the user credentials **mov:password**.
  The management web interface can be opened at **http://localhost:8081** with the credential
  **mov**:**password**.
- * **Mongo express**  the web interface to interact with the MongoDB. The web interface
-  can be opened at **http://localhost:8082**.
- * **Master Of VALAWAI (MOV)**  the web interface to interact with the Master Of VALWAI(MOV). The web interface
-  can be opened at **http://localhost:8083**.
+ * **Mongo express** is the web interface to interact with the MongoDB. The web interface
+ can be opened at **http://localhost:8082**.
+ * **Master Of VALAWAI (MOV)** the web interface to interact with the Master Of VALWAI(MOV). The web interface
+ can be opened at **http://localhost:8083**.
 
 
 ## Links

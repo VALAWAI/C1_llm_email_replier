@@ -1,6 +1,6 @@
 # C1_llm_email_replier
 
 
-## Version 1.0.0 (August 16, 2024)
+## Version 1.0.0 (August 30, 2024)
 
  - First public release.

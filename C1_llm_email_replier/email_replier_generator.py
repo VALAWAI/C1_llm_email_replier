@@ -31,7 +31,7 @@ class EMailReplierGenerator(object):
                  temperature:float=float(os.getenv('REPLY_TEMPERATURE',"0.7")),
                  top_k:int=int(os.getenv('REPLY_TOP_K',"50")),
                  top_p:float=float(os.getenv('REPLY_TOP_P',"0.95")),
-                 system_prompt:str=os.getenv('REPLY_SYSTEM_PROMPT',"You are a polite chatbot who always try to provide solutions to the customers problems"),
+                 system_prompt:str=os.getenv('REPLY_SYSTEM_PROMPT',"You are a polite chatbot who always tries to provide solutions to the customer's problems"),
                  user_prompt:str="Reply to an e-mail with the subject '{subject}' and the content '{content}'"
                  ):
         """Initialize the replier generator
@@ -54,7 +54,7 @@ class EMailReplierGenerator(object):
             REPLY_TOP_P and if it not defined use 0.95.
         system_prompt: str
             The prompt to use as system. It is used to define how the reply must be done. By default get the environment variable
-            REPLY_SYSTEM_PROMPT and if it not defined use 'You are a polite chatbot who always try to provide solutions to the customers problems'.
+            REPLY_SYSTEM_PROMPT and if it not defined use 'You are a polite chatbot who always tries to provide solutions to the customer's problems'.
         user_prompt: str
             The prompt used to pass the e-mial information to generate the reply.
         """
