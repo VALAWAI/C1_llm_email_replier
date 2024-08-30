@@ -86,6 +86,7 @@ class MOV(object):
         logging.debug("Received registered component %s",body)
         msg=json.loads(body)
         self.component_id=msg['id']
+        logging.info(f"Register C1 LLM E-Mail replier with the identifier '{self.component_id}'")
     
     def unregister_component(self):
         """Unregister this component from the MOV (https://valawai.github.io/docs/tutorials/mov/#unregister-a-component)
@@ -94,6 +95,7 @@ class MOV(object):
             
             msg = {"component_id":self.component_id}
             self.message_service.publish_to('valawai/component/unregister',msg)
+            logging.info(f"Unregisterd C1 LLM E-Mail replier with the identifier '{self.component_id}'")
             self.component_id = None
 
     def debug(self,msg:str,payload=None):

@@ -16,7 +16,7 @@ COPY requirements.txt .
 COPY LICENSE .
 COPY *.md .
 COPY asyncapi.yaml .
-COPY C1_llm_email_replier/ .
+COPY C1_llm_email_replier/ C1_llm_email_replier/
 
 RUN pip install -e .
 
@@ -38,4 +38,4 @@ ENV LOG_FILE_LEVEL=DEBUG
 ENV LOG_FILE_MAX_BYTES=1000000
 ENV LOG_FILE_BACKUP_COUNT=5
 
-CMD [“python”, “C1_llm_email_replier”] 
+CMD ["python", "C1_llm_email_replier"]

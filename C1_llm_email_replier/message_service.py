@@ -192,8 +192,17 @@ class MessageService(object):
         """
         try:
             
+            logging.info("Start listening for events")
             self.listen_connection.channel.start_consuming()
+        
+        except KeyboardInterrupt:
             
+            logging.info("Stop listening for events")
+            
+        except pika.exceptions.ConnectionClosedByBroker:
+            
+            logging.info("Closed connection")
+                
         except Exception:
 
             logging.exception("Consuming messages error.")

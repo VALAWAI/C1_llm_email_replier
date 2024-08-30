@@ -45,8 +45,10 @@ The most useful environment variables on the docker image are:
  The default value is **mov**.
  - **RABBITMQ_PASSWORD** is the password used to authenticate the user who can access the RabbitMQ.
  The default value is **password**.
- - **RABBITMQ_MAX_RETRIES** 100
- - **RABBITMQ_RETRY_SLEEP** 3
+ - **RABBITMQ_MAX_RETRIES** is the number maximum of tries to connect to the RabbitMQ.
+ The default value is **100**
+ - **RABBITMQ_RETRY_SLEEP** is the seconds thta the component must wait before to try again to connect with the RabbitMQ.
+ The default value is **3**
  - **REPLY_MAX_NEW_TOKENS** The number maximum of tokens to generate. The default value is **256**.
  - **REPLY_TEMPERATURE** The value used to modulate the next token probabilities. The default value is **0.7**.
  - **REPLY_TOP_K** The number of highest probability tokens to consider for generating the output.
