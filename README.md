@@ -69,11 +69,13 @@ The most useful environment variables on the docker image are:
 
 ## Deploy
 
-On the file [docker-compose.yml](docker-compose.yml), you can see how the docker image
-of this component can be deployed on a valawai environment. On this file are defined
-the profiles **mov** and **mail**. The first one is to launch
-the [Master Of Valawai (MOV)](https://github.com/VALAWAI/MOV). You can use the next
-command to start this component with the MOV.
+After you have the **valawai/c1_llm_email_replier:latest** docker image you can deploy
+this component using the docker compose using the file [docker-compose.yml](docker-compose.yml)
+defined on the [repository](https://github.com/VALAWAI/C1_llm_email_replier).
+
+This configuration defines the profile **mov** to launch the component at the same time that a 
+ [Master of valawai (MOV)](/tutorials/mov). You can use the next
+command to start both.
 
 ```
 COMPOSE_PROFILES=mov docker compose up -d

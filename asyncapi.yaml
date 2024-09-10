@@ -71,23 +71,23 @@ components:
           items:
             - $ref: '#/components/schemas/reply_e_mail_address_payload'
           examples:
-           - [{"type":"FROM","name":"Jane doe","address":"jane.doe@valawai.eu"},{"type":"TO","address":"info@valawai.eu"}]
+           - [{"type":"TO","address":"info@valawai.eu"}]
         subject:
           type: string
           description: The e-mail subject.
           examples:
-           - How to publish a component?
+           - Re: How to create a VALAWAI component?
         is_html:
           type: boolean
           description: This is true if the e-mail content is HTML.
           default: false
           examples:
-           - true
+           - false
         content:
           type: string
           description: The content of the e-mail.
           examples:
-           - Hi! Could you please inform me about the necessary steps to have a component available in the VALAWAI? 
+           - Hi! You can find all the information at https://valawai.github.io/docs/
 
     reply_e_mail_address_payload:
       description: Describe the address associated with an e-mail.
@@ -129,7 +129,7 @@ components:
           type: string
           description: The e-mail subject.
           examples:
-           - How to publish a component?
+           - How to create a VALAWAI component?
         mime_type:
           type: string
           description: The MIME type associated with the e-mail content.
@@ -139,7 +139,7 @@ components:
           type: string
           description: The content of the e-mail.
           examples:
-           - Hi! Could you please inform me about the necessary steps to have a component available in the VALAWAI? 
+           - Hi! I am a new user of the VALAWAI and I do not know how to create a component. Can you help me with it?
         received_at:
           type: integer
           description: The epoch time, in seconds, when the email is received.
