@@ -51,7 +51,7 @@ class App:
             self.message_service.close()
             logging.info("Finished C1 LLM E-Mail Replier")
             
-        except Exception:
+        except:
     
             logging.exception("Could not stop the component")
 
@@ -74,7 +74,7 @@ class App:
             logging.info("Started C1 LLM E-Mail Replier")
             self.message_service.start_consuming()
     
-        except Exception:
+        except:
     
             logging.exception("Could not start the component")
 
@@ -91,9 +91,10 @@ def configure_log():
         file_max_bytes = int(os.getenv("LOG_FILE_MAX_BYTES","1000000"))
         file_backup_count = int(os.getenv("LOG_FILE_BACKUP_COUNT","5"))
         
-        if not os.path.exists("logs"):
-            os.makedirs("logs")
-        file_name=os.path.join('logs','c1_llm_email_replier.txt')
+        log_dir = os.getenv("LOG_DIR","logs")
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        log_file_name=os.path.join(log_dir,os.getenv("LOG_FILE_NAME","c1_llm_email_replier.txt"))
 
         logging.config.dictConfig(
             { 
@@ -118,7 +119,7 @@ def configure_log():
                         'level': file_level,
                         'formatter': 'precise',
                         'class': 'logging.handlers.RotatingFileHandler',
-                        'filename': file_name,
+                        'filename': log_file_name,
                         'maxBytes': file_max_bytes,
                         'backupCount': file_backup_count
                     }

@@ -17,7 +17,7 @@
 from setuptools import setup, find_packages
 setup(
     name='C1_LLM_ E_Mail_replier',
-    version='1.0.0',
+    version='1.1.0',
     packages=find_packages(include=['C1_llm_email_replier', 'C1_llm_email_replier.*']),
     install_requires=[
         'torch>=2.4.0',

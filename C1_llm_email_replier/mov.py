@@ -21,6 +21,8 @@ import re
 from message_service import MessageService
 import json
 import logging
+from _ast import Try
+
 
 class MOV(object):
     """The component used to interatc with the Master Of VALAWAI (MOV)
@@ -37,7 +39,7 @@ class MOV(object):
         """
         self.message_service = message_service
         self.component_id = None
-        self.message_service.listen_for('valawai/c1/llm_email_replier/control/registered',self.registered_component)
+        self.message_service.listen_for('valawai/c1/llm_email_replier/control/registered', self.registered_component)
     
     def __read_file(self, path:str):
         """Read a file and return its content.
@@ -69,36 +71,55 @@ class MOV(object):
         """
         
         msg = self.register_component_msg()
-        self.message_service.publish_to('valawai/component/register',msg)
+        self.message_service.publish_to('valawai/component/register', msg)
         
     def registered_component(self, ch, method, properties, body):
         """Called when the component has been registered.
-
-        Parameters
-        ----------
-        ch : MessageService
-            The service to receive or send messages thought RabbitMQ
-        ch : MessageService
-            The service to receive or send messages thought RabbitMQ
-        ch : MessageService
-            The service to receive or send messages thought RabbitMQ
         """
-        logging.debug("Received registered component %s",body)
-        msg=json.loads(body)
-        self.component_id=msg['id']
+        logging.debug("Received registered component %s", body)
+        msg = json.loads(body)
+        self.component_id = msg['id']
         logging.info(f"Register C1 LLM E-Mail replier with the identifier '{self.component_id}'")
+        
+        try:
+            
+            log_dir = os.getenv("LOG_DIR", "logs")
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+              
+            component_id_path = os.path.join(log_dir, os.getenv("COMPONET_ID_FILE_NAME", "component_id.json"))
+            with open(component_id_path, "w") as component_id_file:
+                content = json.dumps(msg, sort_keys=True, indent=2)
+                component_id_file.write(content)
+            
+        except:
+    
+            logging.exception("Could not store the component id into a file")
     
     def unregister_component(self):
         """Unregister this component from the MOV (https://valawai.github.io/docs/tutorials/mov/#unregister-a-component)
         """
+        try:
+            
+            log_dir = os.getenv("LOG_DIR", "logs")
+            if os.path.exists(log_dir):
+
+                component_id_path = os.path.join(log_dir, os.getenv("COMPONET_ID_FILE_NAME", "component_id.json"))
+                if os.path.isfile(component_id_path):
+                    os.remove(component_id_path)
+            
+        except:
+    
+            logging.exception("Could not remove previous component id file")
+        
         if self.component_id != None:
             
             msg = {"component_id":self.component_id}
-            self.message_service.publish_to('valawai/component/unregister',msg)
+            self.message_service.publish_to('valawai/component/unregister', msg)
             logging.info(f"Unregisterd C1 LLM E-Mail replier with the identifier '{self.component_id}'")
             self.component_id = None
 
-    def debug(self,msg:str,payload=None):
+    def debug(self, msg:str, payload=None):
         """Send a debug log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
         
         Parameters
@@ -108,10 +129,10 @@ class MOV(object):
         payload: object
             The payload associated to the log message.
         """
-        self.__log('DEBUG',msg,payload)
+        self.__log('DEBUG', msg, payload)
         logging.debug(msg)
 
-    def info(self,msg:str,payload=None):
+    def info(self, msg:str, payload=None):
         """Send a info log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
         
         Parameters
@@ -121,10 +142,10 @@ class MOV(object):
         payload: object
             The payload associated to the log message.
         """
-        self.__log('INFO',msg,payload)
+        self.__log('INFO', msg, payload)
         logging.info(msg)
 
-    def warn(self,msg:str,payload=None):
+    def warn(self, msg:str, payload=None):
         """Send a warn log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
         
         Parameters
@@ -134,10 +155,10 @@ class MOV(object):
         payload: object
             The payload associated to the log message.
         """
-        self.__log('WARN',msg,payload)
+        self.__log('WARN', msg, payload)
         logging.warn(msg)
 
-    def error(self,msg:str,payload=None):
+    def error(self, msg:str, payload=None):
         """Send a error log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
         
         Parameters
@@ -147,10 +168,10 @@ class MOV(object):
         payload: object
             The payload associated to the log message.
         """
-        self.__log('ERROR',msg,payload)
+        self.__log('ERROR', msg, payload)
         logging.error(msg)
 
-    def __log(self,level:str,msg:str,payload=None):
+    def __log(self, level:str, msg:str, payload=None):
         """Send a log message to the MOV (https://valawai.github.io/docs/tutorials/mov/#add-a-log-message)
         
         Parameters
@@ -176,5 +197,5 @@ class MOV(object):
             
             msg["component_id"] = self.component_id
         
-        self.message_service.publish_to('valawai/log/add',msg)
+        self.message_service.publish_to('valawai/log/add', msg)
         

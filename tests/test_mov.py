@@ -69,6 +69,7 @@ class TestMOV(unittest.TestCase):
     def __assert_registerd(self, component_id):
         """Check that a component is registered.
         """
+        found = False
         for i in range(10):
             
             time.sleep(1)
@@ -91,16 +92,22 @@ class TestMOV(unittest.TestCase):
                         for component in self.msgs[0]['components']:
                         
                             if component['id'] == component_id:
-                                return
+                                found = True
+                                break;
 
                     break
                 time.sleep(1)
         
-        self.fail(f"Component {component_id} is not registered") 
+        assert found,f"Component {component_id} is not registered"
+        log_dir = os.getenv("LOG_DIR","logs")
+        component_id_path = os.path.join(log_dir,os.getenv("COMPONET_ID_FILE_NAME","component_id.json"))
+        assert os.path.isfile(component_id_path) and os.path.getsize(component_id_path) > 0,"No stored component_id into a file"
+
 
     def __assert_unregisterd(self, component_id):
         """Check that a component is unregistered.
         """
+        found = False
         for i in range(10):
             
             time.sleep(1)
@@ -117,24 +124,25 @@ class TestMOV(unittest.TestCase):
             for j in range(10):
                 
                 if len(self.msgs) != 0 and self.msgs[0]['query_id'] == query_id:
-                    
-                    found = False
+            
+                    found = False        
                     if self.msgs[0]['total'] > 0:
                         
                         for component in self.msgs[0]['components']:
                         
                             if component['id'] == component_id:
                                 found = True
-                                break
+                                continue
 
-                    if found == True:
-                        break;
-                    else:
-                        return
+                    
+                    break
 
                 time.sleep(1)
-        
-        self.fail(f"Component {component_id} is not unregistered") 
+                
+        assert not found,f"Component {component_id} is not unregistered"
+        log_dir = os.getenv("LOG_DIR","logs")
+        component_id_path = os.path.join(log_dir,os.getenv("COMPONET_ID_FILE_NAME","component_id.json"))
+        assert not os.path.isfile(component_id_path) or os.path.getsize(component_id_path) == 0,"No removed component_id into a file"
  
  
     def __assert_register(self):

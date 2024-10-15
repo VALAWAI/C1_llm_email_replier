@@ -6,8 +6,9 @@ ARG LLM_MODEL=HuggingFaceH4/zephyr-7b-beta
 RUN apt-get -qy update && \
     apt-get -qy full-upgrade && \
     apt-get -qy install pip && \
-	pip install -U "huggingface_hub[cli]" && \
-	huggingface-cli download $LLM_MODEL 
+	pip install -U "huggingface_hub[cli]"
+	
+RUN --mount=type=cache,target=/root/.cache/huggingface huggingface-cli download $LLM_MODEL 
 	
 WORKDIR /app
 
@@ -18,7 +19,7 @@ COPY *.md .
 COPY asyncapi.yaml .
 COPY C1_llm_email_replier/ C1_llm_email_replier/
 
-RUN pip install -e .
+RUN --mount=type=cache,target=/root/.cache/pip pip install -e .
 
 ENV RABBITMQ_HOST=mov-mq
 ENV RABBITMQ_PORT=5672.
@@ -37,5 +38,7 @@ ENV LOG_CONSOLE_LEVEL=DEBUG
 ENV LOG_FILE_LEVEL=DEBUG
 ENV LOG_FILE_MAX_BYTES=1000000
 ENV LOG_FILE_BACKUP_COUNT=5
+
+HEALTHCHECK CMD test -s /app/{$LOG_DIR:-logs}/{$COMPONET_ID_FILE_NAME:-component_id.json}
 
 CMD ["python", "C1_llm_email_replier"]

@@ -9,6 +9,7 @@ the [aysncapi](asyncapi.yaml) or on the [component documentation](https://valawa
 
  - Type: C1
  - Name: LLM e-mail replier
+ - Version: 1.1.0 (October 15, 2024)
  - API: [1.0.0 (August 30, 2024)](https://raw.githubusercontent.com/VALAWAI/C1_llm_email_replier/ASYNCAPI_1.0.0/asyncapi.yml)
  - VALAWAI API: [1.2.0 (March 9, 2024)](https://raw.githubusercontent.com/valawai/MOV/ASYNCAPI_1.2.0/asyncapi.yml)
  - Developed By: [IIIA-CSIC](https://www.iiia.csic.es)
@@ -24,16 +25,27 @@ the next script.
 ./buildDockerImages.sh
 ```
 
-At the end you must have the docker image **valawai/c1_llm_email_replier:Z.Y.Z**
-where **X.Y.Z** will be the version of the component. If you want to have
-the image with another tag, for example **latest**, you must call the script
-with this tag as a parameter, for example:
+In the end, you must have the docker image **valawai/c1_llm_email_replier:Z.Y.Z**
+where **X.Y.Z** will be the version of the component. 
+
+This script has the next parameters.
+
+ * **-nc** or **--no-cache** Build a docker image without using the cache.
+ * **-t <tag>** or **--tag <tag>** Build a docker image with a the **<tag>** name.
+ * **-p <platforms>** or **--platform <platforms>** Specify the architectures to build the docker.
+ * **-dp** or **--default-platforms** Uses the default platforms (linux/arm64, linux/amd64).
+ * **-h** or **--help** Show a help message that explains these parameters.
+
+For example the next call can be used to generate the image with the tag **latest**.
 
 ```
-./buildDockerImages.sh latest
+./buildDockerImages.sh -t latest
 ```
 
 And you will obtain the container **valawai/c1_llm_email_replier:latest**.
+
+
+### Docker environment variables
 
 The most useful environment variables on the docker image are:
 
@@ -65,6 +77,32 @@ The most useful environment variables on the docker image are:
  The default value is **1000000**.
  - **LOG_FILE_BACKUP_COUNT** defines the maximum number of rolling files to maintain.
  The default value is **5**.
+ - **LOG_DIR** defines the directory to store the maximum number of rolling files to maintain.
+ The default value is **logs**.
+ - **LOG_FILE_NAME** defines the file name at the **LOG_DIR** where the log messages will be stored.
+ The default value is **c1_llm_email_replier.txt**.
+ - **COMPONET_ID_FILE_NAME** defines the file name at the **LOG_DIR** where the component identifier,
+ obtained when the component is registered in the MOV, will be stored.
+ The default value is **component_id.json**.
+ 
+
+### Docker health check
+
+When this component is registered, it stores the registered result in the file
+**/app/${LOG_DIR:-logs}/${COMPONET_ID_FILE_NAME:-component_id.json}**. Also,
+when the component is unregistered, this file will removed.  Thus, you can check
+the size of this file to know if the component is ready. For example, you can add the following
+configuration to a **docker compose** to check if the component is healthy.
+
+```
+    healthcheck:
+      test: ["CMD-SHELL", "test -s /app/logs/component_id.json"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+      start_interval: 5s
+```
 
 
 ## Deploy
@@ -168,7 +206,7 @@ After that, you have a bash shell where you can interact with the Python code. Y
 to so some common action.
 
 * **run** to start the component.
-* **testAll** to run all all the tests
+* **testAll** to run all the unit tests
 * **test test/test_something.py** to run the tests defined on the file **test_something.py**
 * **test test/test_something.py -k test_do_something** to run the test named **test_do_something** defined on the file **test_something.py**
 

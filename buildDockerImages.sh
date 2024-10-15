@@ -5,17 +5,62 @@ if ! docker stats --no-stream >/dev/null 2>&1; then
 else
 	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 	pushd $DIR > /dev/null
-	VERSION=$(grep --max-count=1 "version='" setup.py  | awk -F "'" '{ print $2 }')
+	TAG=$(grep --max-count=1 "version='" setup.py  | awk -F "'" '{ print $2 }')
 	DOCKER_ARGS=""
-	if [ "no-cache" = "$1" ];
-	then
-		DOCKER_ARGS="$DOCKER_ARGS --no-cache"
-		TAG=${2:-$VERSION}
-	else
-		TAG=${1:-$VERSION}
-	fi
-	pushd $DIR > /dev/null
+	PLATFORMS=""
+	while [[ $# -gt 0 ]]; do
+      case $1 in
+        -nc|--no-cache)
+          DOCKER_ARGS="$DOCKER_ARGS --no-cache"
+          shift # past argument
+          ;;
+        -t|--tag)
+          TAG="$2"
+          shift # past argument
+          shift # past value
+          ;;
+        -p|--platform)
+          PLATFORMS="$2"
+          shift # past argument
+          shift # past value
+          ;;
+        -dp|--default-platforms)
+          PLATFORMS="linux/amd64,linux/arm64"
+          shift # past argument
+          ;;
+        -h|--help*)
+          echo "	-nc|--no-cache			Build a docker image without using the cache."
+          echo "	-t|--tag <tag>			Build a docker image with a the **<tag>** name."
+          echo "	-p|--platform <platforms>	Specify the architectures to build the docker."
+          echo "	-dp|--default-platforms		Uses the default platforms (linux/arm64, linux/amd64)."
+          echo "	-h|--help			Show a help message that explains these parameters."
+          exit 0
+          ;;
+        *)
+          echo "Unknown option $1"
+          exit 1
+          ;;
+      esac
+    done
 
-	DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS -f docker/main/Dockerfile -t valawai/c1_llm_email_replier:$TAG .
+	pushd $DIR > /dev/null
+	if [[ -z $PLATFORMS ]];
+	then
+		DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS -f docker/main/Dockerfile -t valawai/c1_llm_email_replier:$TAG .
+	else
+		if docker buildx ls 2>/dev/null| grep -q c1_llm_email_replier_builder;
+		then
+  			DOCKER_BUILDKIT=1 docker buildx use c1_llm_email_replier_builder
+		else
+  			DOCKER_BUILDKIT=1 docker buildx create --name c1_llm_email_replier_builder --platform=$PLATFORMS --use
+		fi
+		DOCKER_ARGS="$DOCKER_ARGS --platform=$PLATFORMS"
+		DOCKER_ARGS="$DOCKER_ARGS -f docker/main/Dockerfile"
+		DOCKER_ARGS="$DOCKER_ARGS -t valawai/c1_llm_email_replier:$TAG"
+		DOCKER_ARGS="$DOCKER_ARGS --cache-from=type=local,src=.c1_llm_email_replier-docker-cache"
+		DOCKER_ARGS="$DOCKER_ARGS --cache-to=type=local,dest=.c1_llm_email_replier-docker-cache"
+		DOCKER_ARGS="$DOCKER_ARGS --push"
+		DOCKER_BUILDKIT=1 docker buildx build $DOCKER_ARGS .
+	fi
 	popd > /dev/null
 fi
