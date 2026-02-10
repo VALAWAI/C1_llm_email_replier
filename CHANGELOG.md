@@ -1,6 +1,11 @@
 # C1_llm_email_replier
 
 
+## Version 1.2.0 (February 10, 2026)
+
+ - Upgrade dependencies.
+
+
 ## Version 1.1.0 (October 15, 2024)
 
  - Add mechanism to health check the docker container

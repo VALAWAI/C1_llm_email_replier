@@ -27,7 +27,7 @@ else
 		pushd MOV >/dev/null
 		if [ -z "$(docker images -q valawai/mov:latest 2> /dev/null)" ]; then
 
-			./buildDockerImages.sh latest
+			./buildDockerImages.sh -t latest
 			failIfNotSuccess $? "Cannot create the MOV image"
 
 		else
@@ -37,7 +37,7 @@ else
 			if [[ $SRC_DATE > $IMG_DATE ]]; then
 				# The image is older that the last modified file
 
-				./buildDockerImages.sh latest
+				./buildDockerImages.sh -t latest
 				failIfNotSuccess $? "Cannot create the MOV image"
 			fi
 		fi
@@ -55,7 +55,7 @@ else
 		fi
 		rm -rf ${MONGO_LOCAL_DATA:-~/mongo_data/eduteamsDB}
 	fi
-	DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS -f docker/dev/Dockerfile -t valawai/c1_llm_email_replier:dev .
+	DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS --pull -f docker/dev/Dockerfile -t valawai/c1_llm_email_replier:dev .
 	if [ $? -eq 0 ]; then
 		docker compose -f docker/dev/docker-compose.yml up -d
 		DOCKER_PARAMS="--rm --name c1_llm_email_replier_dev --add-host=host.docker.internal:host-gateway -v /var/run/docker.sock:/var/run/docker.sock -it"

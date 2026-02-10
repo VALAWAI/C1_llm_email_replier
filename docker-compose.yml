@@ -1,18 +1,113 @@
 services:
+  mq:
+    image: rabbitmq:${RABBITMQ_TAG:-management}
+    container_name: mov_mq
+    pull_policy: daily
+    profiles: [mov, all]
+    hostname: ${MOV_MQ_HOST:-mq}
+    ports:
+      - ${MOV_MQ_PORT:-5672}:5672
+      - ${MOV_MQ_UI_PORT:-8082}:15672
+    networks:
+      - llm_email_replier_net
+    environment:
+      RABBITMQ_DEFAULT_USER: ${MOV_MQ_USER:-mov}
+      RABBITMQ_DEFAULT_PASS: ${MOV_MQ_PASSWORD:-password}
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+      start_interval: 5s
+
+  mongo:
+    image: mongo:${MONGODB_TAG:-latest}
+    container_name: mov_db
+    restart: unless-stopped
+    pull_policy: daily
+    profiles: [mov, all]
+    hostname: ${MOV_DB_HOST:-mongo}
+    ports:
+      - ${MOV_DB_PORT:-27017}:27017
+    networks:
+      - llm_email_replier_net
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_DATABASE: ${MOV_DB_NAME:-movDB}
+      MOV_DB_NAME: ${MOV_DB_NAME:-movDB}
+      MOV_DB_USER_NAME: ${MOV_DB_USER_NAME:-mov}
+      MOV_DB_USER_PASSWORD: ${MOV_DB_USER_PASSWORD:-password}
+    volumes:
+      - ${MONGO_LOCAL_DATA:-~/.mongo_data/emailSensorMovDB}:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet localhost/${DB_NAME:-movDB} --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'",
+        ]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+      start_interval: 5s
+    configs:
+      - source: init-mongo.js
+        target: /docker-entrypoint-initdb.d/init-mongo.js
+
+  mov:
+    image: valawai/mov:${MOV_TAG:-latest}
+    container_name: mov
+    profiles: [mov, all]
+    depends_on:
+      mongo:
+        condition: service_healthy
+        restart: true
+      mq:
+        condition: service_healthy
+        restart: true
+    ports:
+      - ${MOV_UI_PORT:-8081}:8080
+    networks:
+      - llm_email_replier_net
+    environment:
+      RABBITMQ_HOST: ${MOV_MQ_HOST:-mq}
+      RABBITMQ_PORT: ${MOV_MQ_PORT:-5672}
+      RABBITMQ_USERNAME: ${MOV_MQ_USER:-mov}
+      RABBITMQ_PASSWORD: ${MOV_MQ_PASSWORD:-password}
+      QUARKUS_MONGODB_DATABASE: ${MOV_DB_NAME:-movDB}
+      QUARKUS_MONGODB_CREDENTIALS_USERNAME: ${MOV_DB_USER_NAME:-mov}
+      QUARKUS_MONGODB_CREDENTIALS_PASSWORD: ${MOV_DB_USER_PASSWORD:-password}
+      QUARKUS_MONGODB_HOSTS: ${MOV_DB_HOST:-mongo}:${MOV_DB_PORT:-27017}
+      MOV_URL: http://0.0.0.0:${MOV_UI_PORT:-8081}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s http://localhost:8080/q/health | grep -m 1 -P \"^[\\s|\\{|\\\"]+status[\\s|\\:|\\\"]+.+\\\"\" |grep -q \"\\\"UP\\\"\"",
+        ]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+      start_interval: 5s
+
   llm_email_replier:
     image: valawai/c1_llm_email_replier:${C1_LLM_EMAIL_REPLIER_TAG:-latest}
     container_name: c1_llm_email_replier
+    profiles: [component, all]
     networks:  
       - llm_email_replier_net
     depends_on:
       mov:
         condition: service_healthy
-        restart: true
+        required: false
     environment:
-      RABBITMQ_HOST: ${MQ_HOST:-mq}
-      RABBITMQ_PORT: ${MQ_PORT:-5672}
-      RABBITMQ_USERNAME: ${MQ_USER:-mov}
-      RABBITMQ_PASSWORD: ${MQ_PASSWORD:-password}
+      RABBITMQ_HOST: ${MOV_MQ_HOST:-mq}
+      RABBITMQ_PORT: ${MOV_MQ_PORT:-5672}
+      RABBITMQ_USERNAME: ${MOV_MQ_USER:-mov}
+      RABBITMQ_PASSWORD: ${MOV_MQ_PASSWORD:-password}
       REPLY_MAX_NEW_TOKENS: ${REPLY_MAX_NEW_TOKENS:-256}
       REPLY_TEMPERATURE: ${REPLY_TEMPERATURE:-0.7}
       REPLY_TOP_K: ${REPLY_TOP_K:-50}
@@ -28,86 +123,19 @@ services:
       start_interval: 5s
 
 
-  mq:
-    image: rabbitmq:${RABBITMQ_TAG:-management}
-    container_name: mov_mq
-    profiles: [mov]
-    hostname: ${MQ_HOST:-mq}
-    ports:
-      - ${MQ_LOCAL_PORT:-5672}:5672
-      - ${MQ_LOCAL_UI_PORT:-8081}:15672
-    networks:
-      - llm_email_replier_net
-    environment:
-      RABBITMQ_DEFAULT_USER: ${MQ_USER:-mov}
-      RABBITMQ_DEFAULT_PASS: ${MQ_PASSWORD:-password}
-    healthcheck:
-      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
-      interval: 1m
-      timeout: 10s
-      retries: 5
-      start_period: 1m
-      start_interval: 5s
-
-  mongo:
-    image: mongo:${MONGODB_TAG:-latest}
-    container_name: mov_db
-    profiles: [mov]
-    hostname: ${DB_HOST:-mongo}
-    ports:
-      - ${MONGO_LOCAL_PORT:-27017}:27017
-    networks:
-      - llm_email_replier_net
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-root}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
-      MONGO_INITDB_DATABASE: ${DB_NAME:-movDB}
-      DB_NAME: ${DB_NAME:-movDB}
-      DB_USER_NAME: ${DB_USER_NAME:-mov}
-      DB_USER_PASSWORD: ${DB_USER_PASSWORD:-password}
-    volumes:
-      - ./docker/deploy/initialize-movDB.js:/docker-entrypoint-initdb.d/init-mongo.js
-      - ${MONGO_LOCAL_DATA:-~/mongo_data/emailActuatorMovDB}:/data/db
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet localhost/${DB_NAME:-movDB} --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"]
-      interval: 1m
-      timeout: 10s
-      retries: 5
-      start_period: 1m
-      start_interval: 5s  
-
-  mov:
-    image: valawai/mov:${MOV_TAG:-latest}
-    container_name: mov
-    profiles: [mov]
-    depends_on:
-      mongo:
-        condition: service_healthy
-        restart: true
-      mq:
-        condition: service_healthy
-        restart: true
-    ports:
-      - ${MOV_UI_PORT:-8080}:8080
-    networks:  
-      - llm_email_replier_net
-    environment:
-      RABBITMQ_HOST: ${MQ_HOST:-mq}
-      RABBITMQ_PORT: ${MQ_PORT:-5672}
-      RABBITMQ_USERNAME: ${MQ_USER:-mov}
-      RABBITMQ_PASSWORD: ${MQ_PASSWORD:-password}
-      QUARKUS_MONGODB_DATABASE: ${DB_NAME:-movDB}
-      QUARKUS_MONGODB_CREDENTIALS_USERNAME: ${DB_USER_NAME:-mov}
-      QUARKUS_MONGODB_CREDENTIALS_PASSWORD: ${DB_USER_PASSWORD:-password}
-      QUARKUS_MONGODB_HOSTS: ${DB_HOST:-mongo}:${MONGO_PORT:-27017}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:8080/q/health | grep -m 1 -P \"^[\\s|\\{|\\\"]+status[\\s|\\:|\\\"]+.+\\\"\" |grep -q \"\\\"UP\\\"\""]
-      interval: 1m
-      timeout: 10s
-      retries: 5
-      start_period: 1m
-      start_interval: 5s  
-
 
 networks:
   llm_email_replier_net:
+
+
+configs:
+  init-mongo.js:
+    content: |
+      db.createUser({
+        user: process.env.MOV_DB_USER_NAME,
+        pwd: process.env.MOV_DB_USER_PASSWORD,
+        roles: [{
+          role: 'readWrite',
+          db: process.env.MOV_DB_NAME
+        }]
+      })

@@ -46,7 +46,7 @@ else
 	pushd $DIR > /dev/null
 	if [[ -z $PLATFORMS ]];
 	then
-		DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS -f docker/main/Dockerfile -t valawai/c1_llm_email_replier:$TAG .
+		DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS --pull -f docker/main/Dockerfile -t valawai/c1_llm_email_replier:$TAG .
 	else
 		if docker buildx ls 2>/dev/null| grep -q c1_llm_email_replier_builder;
 		then

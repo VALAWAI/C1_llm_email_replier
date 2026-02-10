@@ -15,34 +15,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from C1_llm_email_replier.message_service import MessageService
-import re
-import time
-
 import json
+import time
+import unittest
+
+from c1_llm_email_replier.message_service import MessageService
+
 
 class TestMessageService(unittest.TestCase):
-    """Class to test the service to interact with the rabbitMQ
-    """
-    
+    """Class to test the service to interact with the rabbitMQ"""
+
     def setUp(self):
-        """Create the message service.
-        """
+        """Create the message service."""
+
         self.message_service=MessageService()
 
     def tearDown(self):
-        """Stops the message service.
-        """
+        """Stops the message service."""
+
         self.message_service.close()
-    
+
     def test_should_not_initilize_to_an_undefined_server(self):
-        """Test that can not register to an undefined server
-        """
-        
+        """Test that can not register to an undefined server"""
+
         error=None
         before_test=int(time.time())
         retry_sleep_seconds=1
@@ -50,22 +45,23 @@ class TestMessageService(unittest.TestCase):
         try:
 
             MessageService(host='undefined',max_retries=max_retries,retry_sleep_seconds=retry_sleep_seconds)
-            
-        except Exception as e:
+
+        except ValueError as e:
             # Ignored
             error=e
 
         after_test=int(time.time())
-        assert error != None
+        assert error is not None
         expected_test_time=before_test+retry_sleep_seconds*max_retries
-        assert  abs(expected_test_time-after_test) <= retry_sleep_seconds
-        
+        assert abs(expected_test_time-after_test) <= retry_sleep_seconds
+
     def test_publish_and_listen(self):
-        """Test that is publish and listen for messages.
-        """
+        """Test that is publish and listen for messages."""
+
         queue="Queue_to_test_message_service"
         msgs=[]
-        callback = lambda ch, method, properties, body: msgs.append(body)
+        def callback(_ch, _method, _properties, body):
+            return msgs.append(body)
         self.message_service.listen_for(queue,callback)
         self.message_service.start_consuming_and_forget()
         msg={
@@ -73,13 +69,15 @@ class TestMessageService(unittest.TestCase):
             "name": "name"
         }
         self.message_service.publish_to(queue,msg)
-        for i in range(10):
-            
+        for _i in range(10):
+
             if len(msgs) != 0:
                 break
-            
+
             time.sleep(1)
-        
+
         assert len(msgs) == 1
         assert msg == json.loads(msgs[0])
-                
+
+if __name__ == '__main__':
+    unittest.main()

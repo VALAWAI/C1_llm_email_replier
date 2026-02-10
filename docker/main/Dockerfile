@@ -1,18 +1,19 @@
-# syntax=docker/dockerfile:experimental
-FROM python:3.9.19-bullseye
+FROM python:3-slim
 
-ARG LLM_MODEL=HuggingFaceH4/zephyr-7b-beta
+ARG LLM_MODEL=HuggingFaceH4/zephyr-7b-alpha
+ENV LLM_MODEL=$LLM_MODEL
 
-RUN apt-get -qy update && \
-    apt-get -qy full-upgrade && \
-    apt-get -qy install pip && \
-	pip install -U "huggingface_hub[cli]"
-	
-RUN --mount=type=cache,target=/root/.cache/huggingface huggingface-cli download $LLM_MODEL 
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt -qy update && apt-get -qy install pip curl
+
+RUN --mount=type=cache,target=/root/.cache/pip pip install -U "huggingface_hub"
+
+RUN --mount=type=cache,target=/root/.cache/huggingface hf download $LLM_MODEL 
 	
 WORKDIR /app
 
-COPY setup.py .
+COPY pyproject.toml .
 COPY requirements.txt .
 COPY LICENSE .
 COPY *.md .

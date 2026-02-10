@@ -1,3 +1,4 @@
+# 
 # This file is part of the C1_llm_emial_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 # 
@@ -13,21 +14,9 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-from setuptools import setup, find_packages
-setup(
-    name='C1_LLM_ E_Mail_replier',
-    version='1.1.0',
-    packages=find_packages(include=['C1_llm_email_replier', 'C1_llm_email_replier.*']),
-    install_requires=[
-        'torch>=2.4.0',
-        'transformers>=4.44.2',
-        'accelerate>=0.33.0',
-        'pika>=1.3.2',
-        'html2text>=2024.2.26'
-    ],
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest']
-)
+import os
+import sys
 
-   
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))

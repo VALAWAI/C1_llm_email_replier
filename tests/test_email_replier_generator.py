@@ -19,7 +19,7 @@ import unittest
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from C1_llm_email_replier.email_replier_generator import EMailReplierGenerator
+from c1_llm_email_replier.email_replier_generator import EMailReplierGenerator
 
 class TestEMailReplierGenerator(unittest.TestCase):
     """Class to test the e-mail replier generator

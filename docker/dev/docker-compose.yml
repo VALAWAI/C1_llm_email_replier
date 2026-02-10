@@ -3,39 +3,65 @@ services:
     image: rabbitmq:${RABBITMQ_TAG:-management}
     container_name: mov_mq_dev
     restart: unless-stopped
+    pull_policy: daily
     ports:
       - ${MQ_PORT:-5672}:5672
       - ${MQ_UI_PORT:-8081}:15672
     networks:
-      - c0_email_actuator_dev
+      - c1_llm_email_replier_dev
     environment:
       RABBITMQ_DEFAULT_USER: ${MQ_USER:-mov}
       RABBITMQ_DEFAULT_PASS: ${MQ_PASSWORD:-password}
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+      start_interval: 5s
+
   mongo:
     image: mongo:${MONGO_TAG:-latest}
     container_name: mov_db_dev
     restart: unless-stopped
+    pull_policy: daily
     ports:
       - ${MONGO_PORT:-27017}:27017
     networks:
-      - c0_email_actuator_dev
+      - c1_llm_email_replier_dev
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-movDB}
+      MOV_DB_NAME: ${MOV_DB_NAME:-movDB}
+      MOV_DB_USER_NAME: ${MOV_DB_USER_NAME:-mov}
+      MOV_DB_USER_PASSWORD: ${MOV_DB_USER_PASSWORD:-password}
     volumes:
-      - ./initialize-movDB.js:/docker-entrypoint-initdb.d/init-mongo.js
-      - ${MONGO_LOCAL_DATA:-~/mongo_data/movDB}:/data/db
+      - ${MONGO_LOCAL_DATA:-~/.mongo_data/movDB}:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet localhost/${DB_NAME:-movDB} --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+      start_interval: 5s  
+    configs:
+      - source: init-mongo.js
+        target: /docker-entrypoint-initdb.d/init-mongo.js
+
   mongo_express:
     image: mongo-express:${MONGO_EXPRESS_TAG:-latest}
     container_name: mov_db_ui_dev
     restart: unless-stopped
+    pull_policy: daily
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+        restart: true
     ports:
       - ${MONGO_ADMIN_PORT:-8082}:8081
     networks:  
-      - c0_email_actuator_dev
+      - c1_llm_email_replier_dev
     environment:
       ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_ADMIN_USER:-admin}
       ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_ADMIN_PASSWORD:-password}
@@ -43,6 +69,7 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-password}
       ME_CONFIG_MONGODB_PORT: ${MONGO_PORT:-27017}
       ME_CONFIG_MONGODB_SERVER: mongo
+    
   mov:
     image: valawai/mov:${MOV_TAG:-latest}
     container_name: mov_dev
@@ -53,17 +80,29 @@ services:
     ports:
       - ${MOV_UI_PORT:-8083}:8080
     networks:  
-      - c0_email_actuator_dev
+      - c1_llm_email_replier_dev
     environment:
       RABBITMQ_HOST: mq
       RABBITMQ_PORT: ${MQ_PORT:-5672}
       RABBITMQ_USERNAME: ${MQ_USER:-mov}
       RABBITMQ_PASSWORD: ${MQ_PASSWORD:-password}
-      QUARKUS_MONGODB_DATABASE: ${DB_NAME:-movDB}
-      QUARKUS_MONGODB_CREDENTIALS_USERNAME: ${DB_USER_NAME:-mov}
-      QUARKUS_MONGODB_CREDENTIALS_PASSWORD: ${DB_USER_PASSWORD:-password}
+      QUARKUS_MONGODB_DATABASE: ${MOV_DB_NAME:-movDB}
+      QUARKUS_MONGODB_CREDENTIALS_USERNAME: ${MOV_DB_USER_NAME:-mov}
+      QUARKUS_MONGODB_CREDENTIALS_PASSWORD: ${MOV_DB_USER_PASSWORD:-password}
       QUARKUS_MONGODB_HOSTS: mongo:${MONGO_PORT:-27017}
       MOV_URL: http://localhost:${MOV_UI_PORT:-8083}
 
 networks:
-  c0_email_actuator_dev:
+  c1_llm_email_replier_dev:
+
+configs:
+  init-mongo.js:
+    content: |
+      db.createUser({
+        user: process.env.MOV_DB_USER_NAME,
+        pwd: process.env.MOV_DB_USER_PASSWORD,
+        roles: [{
+          role: 'readWrite',
+          db: process.env.MOV_DB_NAME
+        }]
+      })

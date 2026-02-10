@@ -20,9 +20,9 @@ import os
 import sys
 from _ast import Or
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from C1_llm_email_replier.mov import MOV
-from C1_llm_email_replier.message_service import MessageService
-from C1_llm_email_replier.change_parameters_handler import ChangeParametersHandler
+from c1_llm_email_replier.mov import MOV
+from c1_llm_email_replier.message_service import MessageService
+from c1_llm_email_replier.change_parameters_handler import ChangeParametersHandler
 import re
 import time
 import logging
