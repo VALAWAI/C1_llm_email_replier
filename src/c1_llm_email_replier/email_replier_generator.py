@@ -25,7 +25,7 @@ class EMailReplierGenerator(object):
     """
     
     def __init__(self,
-                 model:str=os.getenv('LLM_MODEL',"HuggingFaceH4/zephyr-7b-alpha"),
+                 model:str=os.getenv('LLM_MODEL',"HuggingFaceH4/zephyr-7b-beta"),
                  max_new_tokens:int=int(os.getenv('REPLY_MAX_NEW_TOKENS',"256")),
                  temperature:float=float(os.getenv('REPLY_TEMPERATURE',"0.7")),
                  top_k:int=int(os.getenv('REPLY_TOP_K',"50")),
@@ -39,7 +39,7 @@ class EMailReplierGenerator(object):
         ----------
         model : str
             The LLM model name (https://huggingface.co). By default get the environment variable
-            LLM_MODEL and if it not defined use 'HuggingFaceH4/zephyr-7b-alpha'.
+            LLM_MODEL and if it not defined use 'HuggingFaceH4/zephyr-7b-beta'.
         max_new_tokens : int
             The number maximum of tokens to generate. By default get the environment variable
             REPLY_MAX_NEW_TOKENS and if it not defined use 256.

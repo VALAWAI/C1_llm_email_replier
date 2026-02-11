@@ -1,0 +1,7 @@
+{
+	"max_new_tokens": 101.0,
+	"temperature": 0.2,
+	"top_k": 3.0,
+	"top_p": 0.4,
+	"system_prompt": "New system prompt"
+}

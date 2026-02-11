@@ -1,6 +1,6 @@
 FROM python:3-slim
 
-ENV LLM_MODEL=HuggingFaceH4/zephyr-7b-alpha
+ENV LLM_MODEL=HuggingFaceH4/zephyr-7b-beta
 ENV RABBITMQ_HOST=host.docker.internal
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \

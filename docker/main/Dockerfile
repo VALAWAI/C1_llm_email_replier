@@ -1,6 +1,6 @@
 FROM python:3-slim
 
-ARG LLM_MODEL=HuggingFaceH4/zephyr-7b-alpha
+ARG LLM_MODEL=HuggingFaceH4/zephyr-7b-beta
 ENV LLM_MODEL=$LLM_MODEL
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
