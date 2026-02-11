@@ -14,7 +14,7 @@ and length) and defining a specific "persona" through a system prompt.
 - **Name**: LLM e-mail replier
 - **Documentation**: [https://valawai.github.io/docs/components/C1/llm_email_replier](https://valawai.github.io/docs/components/C1/llm_email_replier)
 - **Versions**:
-  - **Stable version**: [1.2.0 (February 10, 2026)](https://github.com/VALAWAI/C1_llm_email_replier/tree/1.2.0)
+  - **Stable version**: [1.2.0 (February 11, 2026)](https://github.com/VALAWAI/C1_llm_email_replier/tree/1.2.0)
   - **API**: [1.0.0 (March 16, 2024)](https://raw.githubusercontent.com/VALAWAI/C1_llm_email_replier/ASYNCAPI_1.0.0/asyncapi.yml)
   - **Required MOV API**: [1.2.0 (March 9, 2024)](https://raw.githubusercontent.com/valawai/MOV/ASYNCAPI_1.2.0/asyncapi.yml)
 - **Developed By**: [IIIA-CSIC](https://www.iiia.csic.es)
@@ -125,36 +125,6 @@ To exit the development environment, simply type `exit` in the bash shell or run
 ```
 
 In either case, the development environment will gracefully shut down, including all activated services like MOV, RabbitMQ, MongoDB, and Mongo Express.
-
-  
-## Development
-
-You can start the development environment with the script:
-
-```shell script
-./startDevelopmentEnvironment.sh
-```
-
-After that, you have a bash shell where you can interact with the Python code. You can use the next command
-to so some common action.
-
-* **run** to start the component.
-* **testAll** to run all the unit tests
-* **test test/test_something.py** to run the tests defined on the file **test_something.py**
-* **test test/test_something.py -k test_do_something** to run the test named **test_do_something** defined on the file **test_something.py**
-
-Also, this starts the tools:
-
- * **RabbitMQ** is the server that manages the message brokers.
- The management web interface can be opened at **http://localhost:8081** with the credential
- **mov**:**password**.
- * **MongoDB** is the database used by the MOV. The database is named **movDB** and the user credentials **mov:password**.
- The management web interface can be opened at **http://localhost:8081** with the credential
- **mov**:**password**.
- * **Mongo express** is the web interface to interact with the MongoDB. The web interface
- can be opened at **http://localhost:8082**.
- * **Master Of VALAWAI (MOV)** the web interface to interact with the Master Of VALWAI(MOV). The web interface
- can be opened at **http://localhost:8083**.
 
 
 ## Helpful Links

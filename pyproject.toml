@@ -6,12 +6,12 @@ build-backend = "hatchling.build"
 [project]
 name = "C1_LLM_EMail_replier"
 version = "1.2.0"
-description = "C2 component that calculate the justice value of a treatment."
+description = "C1 component that generate a reply to an e-mail using a LLM."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "GPL-3.0"
 license-files = [ "LICENSE"]
-keywords = ["VALAWAI", "C2", "justice"]
+keywords = ["VALAWAI", "C1", "e-mail"]
 authors = [{ name = "IIIA-CSIC"}]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -28,7 +28,7 @@ dependencies = [
 	]
 
 [project.urls]
-"Documentation" = "https://valawai.github.io/docs/components/C2/treatment_justice_valuator"
+"Documentation" = "https://valawai.github.io/docs/components/C1/llm_email_replier"
 "Changelog" = "https://github.com/VALAWAI/C1_llm_email_replier/blob/main/CHANGELOG.md"
 "Source" = "https://github.com/VALAWAI/C1_llm_email_replier/tree/main"
 

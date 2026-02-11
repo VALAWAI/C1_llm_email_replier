@@ -55,7 +55,7 @@ services:
     configs:
       - source: init-mongo.js
         target: /docker-entrypoint-initdb.d/init-mongo.js
-
+  
   mov:
     image: valawai/mov:${MOV_TAG:-latest}
     container_name: mov
@@ -121,8 +121,6 @@ services:
       retries: 5
       start_period: 1m
       start_interval: 5s
-
-
 
 networks:
   llm_email_replier_net:

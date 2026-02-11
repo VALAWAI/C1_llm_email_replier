@@ -1,9 +1,9 @@
 # C1_llm_email_replier
 
 
-## Version 1.2.0 (February 10, 2026)
+## Version 1.2.0 (February 11, 2026)
 
- - Upgrade dependencies.
+ - Adapt to the newest Python structure
 
 
 ## Version 1.1.0 (October 15, 2024)
