@@ -16,15 +16,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
+from enum import Enum
 from pydantic import BaseModel, Field
 
+class ReplyEMailAddressType(str, Enum):
+    TO = "TO"
+    CC = "CC"
+    BCC = "BCC"
 
-class ChangeParametersPayload(BaseModel):
-	"""The payload of the message to change the parameters of the component."""
+class ReplyEMailAddressPayload(BaseModel):
+	"""Describe the address associated with an e-mail."""
 
-	max_new_tokens: float | None = Field(default=None, ge=100.0, le=1000.0, title="The maximum of tokens to use in the LLM.")
-	temperature: float | None = Field(default=None, ge=0.0, le=1.0, title="The temperature of the LLM.")
-	top_k: float | None = Field(default=None, ge=1.0, le=100.0, title="The top K to use in the LLM.")
-	top_p: float | None = Field(default=None, ge=0.0, le=1.0, title="The top P to use in the LLM.")
-	system_prompt: str | None = Field(default=None,min_length=10, max_length=10000, title="The prompt to use in the LLM.")
+	address_type: ReplyEMailAddressType | None = Field(default=None, alias="type", title="The type of address.")
+	name: str | None = Field(default=None, title="The name of the user."),
+	address: str | None = Field(default=None, title="The e-mail address.")

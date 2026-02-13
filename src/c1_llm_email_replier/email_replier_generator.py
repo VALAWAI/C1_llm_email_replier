@@ -61,11 +61,9 @@ class EMailReplierGenerator(object):
         self.pipe = pipeline(
           "text-generation", 
           model=model_id, 
-          torch_dtype=torch.bfloat16, 
+          dtype=torch.bfloat16, 
           device_map="auto",
           model_kwargs={
-            "load_in_4bit": True,  
-            "bnb_4bit_compute_dtype": torch.bfloat16,
             "use_cache": True      
           }
         )
@@ -105,7 +103,7 @@ class EMailReplierGenerator(object):
                  "content": self.user_prompt.format(subject=subject,content=content)
             }
         ]
-        prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        prompt = self.pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         outputs = self.pipe(
           prompt, 
           max_new_tokens=self.max_new_tokens, 
@@ -113,7 +111,7 @@ class EMailReplierGenerator(object):
           temperature=self.temperature, 
           top_k=self.top_k, 
           top_p=self.top_p,
-          pad_token_id=self.tokenizer.eos_token_id
+          pad_token_id=self.pipe.tokenizer.eos_token_id
         )        
         reply = outputs[0]["generated_text"]
         reply_subject = f"Re: {subject}"

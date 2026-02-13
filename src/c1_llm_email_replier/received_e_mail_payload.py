@@ -16,15 +16,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 from pydantic import BaseModel, Field
+from received_e_mail_address_payload import ReceivedEMailAddressPayload
 
+class ReceivedEMailPayload(BaseModel):
+	"""The payload containing metadata and content of a received e-mail."""
 
-class ChangeParametersPayload(BaseModel):
-	"""The payload of the message to change the parameters of the component."""
-
-	max_new_tokens: float | None = Field(default=None, ge=100.0, le=1000.0, title="The maximum of tokens to use in the LLM.")
-	temperature: float | None = Field(default=None, ge=0.0, le=1.0, title="The temperature of the LLM.")
-	top_k: float | None = Field(default=None, ge=1.0, le=100.0, title="The top K to use in the LLM.")
-	top_p: float | None = Field(default=None, ge=0.0, le=1.0, title="The top P to use in the LLM.")
-	system_prompt: str | None = Field(default=None,min_length=10, max_length=10000, title="The prompt to use in the LLM.")
+	addresses: list[ReceivedEMailAddressPayload] = Field(default_factory=list, title="List of all participants (sender and recipients) associated with the email.")
+	subject: str | None = Field(default=None, title="The subject line of the email.")
+	mime_type: str | None = Field(default=None, title="The MIME type of the content (e.g., text/html, text/plain).")
+	content: str | None = Field(default=None, title="The actual body content of the email.")
+	received_at: int | None = Field(default=None, title="The Unix epoch timestamp (seconds) when the email was received.")

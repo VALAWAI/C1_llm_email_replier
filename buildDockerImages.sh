@@ -5,7 +5,8 @@ if ! docker stats --no-stream >/dev/null 2>&1; then
 else
 	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 	pushd $DIR > /dev/null
-	TAG=$(grep --max-count=1 "version='" setup.py  | awk -F "'" '{ print $2 }')
+	TAG=$(grep --max-count=1 "version" pyproject.toml  | awk -F "\"" '{ print $2 }')
+
 	DOCKER_ARGS=""
 	PLATFORMS=""
 	while [[ $# -gt 0 ]]; do

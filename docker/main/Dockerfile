@@ -1,7 +1,6 @@
 FROM python:3-slim
 
 ARG LLM_MODEL=HuggingFaceH4/zephyr-7b-beta
-ENV LLM_MODEL=$LLM_MODEL
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -18,8 +17,7 @@ COPY requirements.txt .
 COPY LICENSE .
 COPY *.md .
 COPY asyncapi.yaml .
-COPY C1_llm_email_replier/ C1_llm_email_replier/
-
+COPY src/ src/
 RUN --mount=type=cache,target=/root/.cache/pip pip install -e .
 
 ENV RABBITMQ_HOST=mov-mq
@@ -42,4 +40,4 @@ ENV LOG_FILE_BACKUP_COUNT=5
 
 HEALTHCHECK CMD test -s /app/{$LOG_DIR:-logs}/{$COMPONET_ID_FILE_NAME:-component_id.json}
 
-CMD ["python", "C1_llm_email_replier"]
+CMD ["python", "src/c1_llm_email_replier"]

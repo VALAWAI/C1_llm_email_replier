@@ -1,0 +1,18 @@
+{
+	"addresses":[
+		{	
+			"type":"FROM",
+			"name":"Jon Doe",
+			"address":"jon_doe@valawai.eu"	
+		},
+		{
+			"type":"TO",
+		    "name":"Jane Doe",
+		    "address":"jane@doe.com"
+		}
+	],
+	"subject":"How to create a VALAWAI component?",
+	"mime_type":"text/plain",
+	"content":"Hi Jane,\n\nCan you inform me how to create a VALAWAI component\n\nBest regards,\nJon",
+	"received_at":1715342664
+}

@@ -30,3 +30,23 @@ def load_change_parameters_json():
 	"""Obtain the distionary defined in the change_parameters.json"""
 
 	return __load_json('change_parameters.json')
+
+def load_reply_e_mail_address_payload_json():
+	"""Obtain the distionary defined in the reply_e_mail_address_payload.json"""
+
+	return __load_json('reply_e_mail_address_payload.json')
+
+def load_reply_e_mail_payload_json():
+	"""Obtain the distionary defined in the reply_e_mail_payload.json"""
+
+	return __load_json('reply_e_mail_payload.json')
+
+def load_received_e_mail_address_payload_json():
+	"""Obtain the distionary defined in the received_e_mail_address_payload.json"""
+
+	return __load_json('received_e_mail_address_payload.json')
+
+def load_received_e_mail_payload_json():
+	"""Obtain the distionary defined in the received_e_mail_address.json"""
+
+	return __load_json('received_e_mail_payload.json')

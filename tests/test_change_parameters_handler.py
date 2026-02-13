@@ -251,7 +251,7 @@ class TestChangeParametersHandler(unittest.TestCase):
     self.__assert_process_change_parameters('INFO', parameters)
     self.assertEqual(str(top_p), os.getenv("REPLY_TOP_P"))
 
-  def test_not_change_system_prompt_with_a_value_less_than_10(self):
+  def test_not_change_system_prompt_with_a_prompt_length_too_short(self):
     """Check that the handler not change the 'system_prompt' if the value is less than 10 characters
     """
     
@@ -260,7 +260,7 @@ class TestChangeParametersHandler(unittest.TestCase):
     }
     self.__assert_process_change_parameters('ERROR', parameters)
 
-  def test_not_change_system_prompt_with_a_value_more_than_10000(self):
+  def test_not_change_system_prompt_with_a_prompt_length_too_long(self):
     """Check that the handler not change the 'system_prompt' if the value is more than 10000 characters
     """
     

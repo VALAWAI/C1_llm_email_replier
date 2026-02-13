@@ -15,52 +15,57 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
+import json
+import logging
+import math
 import os
-import sys
-from _ast import Or
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import time
+import unittest
+import uuid
+
+from mov_api import mov_get_log_message_with
+
 from c1_llm_email_replier.mov import MOV
 from c1_llm_email_replier.message_service import MessageService
-from c1_llm_email_replier.received_email_handler import ReceivedEMailHandler
-import re
-import time
-import logging
-import json
-import requests
-import uuid
-import urllib.parse
+from c1_llm_email_replier.received_e_mail_handler import ReceivedEMailHandler
 
 
 class TestReceivedEMailHandler(unittest.TestCase):
     """Class to test the handler of the receiver e-mails to reply
     """
     
-    def setUp(self):
-        """Create the handler.
-        """
-        self.message_service = MessageService()
-        self.mov = MOV(self.message_service)
-        self.msgs = []
-        self.handler = ReceivedEMailHandler(self.message_service, self.mov)
+    @classmethod
+    def setUpClass(cls):
+        """Create the handler."""
         
-    def tearDown(self):
-        """Stops the message service.
-        """
-        self.mov.unregister_component()
-        self.message_service.close()
+        cls.message_service = MessageService()
+        cls.mov = MOV(cls.message_service)
+        cls.handler = ReceivedEMailHandler(cls.message_service, cls.mov)
+        cls.msgs = []
+        cls.message_service.listen_for('valawai/c1/llm_email_replier/data/reply_e_mail', cls.callback)
+        cls.message_service.start_consuming_and_forget()
     
-    def callback(self, ch, method, properties, body):
-        """Called when a message is received from a listener.
-        """
+    @classmethod
+    def tearDownClass(cls):
+        """Stops the message service."""
+        
+        cls.mov.unregister_component()
+        cls.message_service.close()
+    
+    @classmethod
+    def callback(cls, _ch, _method, _properties, body):
+        """Called when a message is received from a listener."""
+        
         try:
-            
+        
             logging.debug("Received %s", body)
             msg = json.loads(body)
-            self.msgs.append(msg)
-            
-        except Exception as error:
-            print(error)
+            cls.msgs.append(msg)
+        
+        except ValueError:
+        
+            logging.exception("Unexpected %s", body)
+    
     
     def test_capture_bad_json_message_body(self):
         """Check that the handler can manage when the body is not a valid json
@@ -147,9 +152,8 @@ class TestReceivedEMailHandler(unittest.TestCase):
             The replied e-mail
         """
         
-        self.message_service.listen_for('valawai/c1/llm_email_replier/data/reply_e_mail', self.callback)
-        self.message_service.start_consuming_and_forget()
-        self.message_service.publish_to('valawai/c1/llm_email_replier/data/received_e_mail', e_mail)
+        e_mail_payload = json.dumps(e_mail)
+        self.message_service.publish_to('valawai/c1/llm_email_replier/data/received_e_mail', e_mail_payload)
         
         expected_address = []
         for address in e_mail['address']:

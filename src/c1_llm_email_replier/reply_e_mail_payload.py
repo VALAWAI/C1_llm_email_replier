@@ -16,15 +16,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 from pydantic import BaseModel, Field
+from reply_e_mail_address_payload import ReplyEMailAddressPayload
 
+class ReplyEMailPayload(BaseModel):
+	"""The payload with the information of a reply e-mail."""
 
-class ChangeParametersPayload(BaseModel):
-	"""The payload of the message to change the parameters of the component."""
-
-	max_new_tokens: float | None = Field(default=None, ge=100.0, le=1000.0, title="The maximum of tokens to use in the LLM.")
-	temperature: float | None = Field(default=None, ge=0.0, le=1.0, title="The temperature of the LLM.")
-	top_k: float | None = Field(default=None, ge=1.0, le=100.0, title="The top K to use in the LLM.")
-	top_p: float | None = Field(default=None, ge=0.0, le=1.0, title="The top P to use in the LLM.")
-	system_prompt: str | None = Field(default=None,min_length=10, max_length=10000, title="The prompt to use in the LLM.")
+	addresses: list[ReplyEMailAddressPayload] | None = Field(default_factory=list,title="The addresses of the people to receive the reply.")
+	subject: str | None = Field(default=None, title="The e-mail subject.")
+	is_html: bool | None = Field(default=None, title="True if the e-mail content is HTML.")
+	content: str | None = Field(default=None, title="The content of the e-mail.")

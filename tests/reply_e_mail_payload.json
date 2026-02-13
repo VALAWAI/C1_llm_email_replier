@@ -1,0 +1,12 @@
+{
+	"addresses":[
+		{	
+			"type":"TO",
+			"name":"Jon Doe",
+			"address":"jon_doe@valawai.eu"	
+		}
+	],
+	"subject":"Re: How to create a VALAWAI component?",
+	"is_html":false,
+	"content":"Hi Jane,\n\nYou can find all the information at https://valawai.github.io/docs/\n\nBest regards,\nJon"
+}

@@ -1,19 +1,19 @@
 asyncapi: '2.6.0'
 info:
- title: C1 LLM E-mail replier API
- version: '1.0.0'
- description: |
-  This VALAWAI component generates a reply for a received e-mail.
- license:
-  name: GNU General Public License version 3
-  url: https://opensource.org/license/gpl-3-0/
- contact:
-  name: VALAWAI
-  url: https://valawai.eu/
+  title: C1 LLM E-mail replier API
+  version: '1.1.0'
+  description: |
+    This VALAWAI component generates a reply for a received e-mail.
+  license:
+    name: GNU General Public License version 3
+    url: https://opensource.org/license/gpl-3-0/
+  contact:
+    name: VALAWAI
+    url: https://valawai.eu/
 
 channels:
   valawai/c1/llm_email_replier/data/reply_e_mail:
-    description:  Publish the reply to the received e-mail.
+    description: Publish the reply to the received e-mail.
     publish:
       message:
         $ref: '#/components/messages/reply_e_mail'
@@ -57,37 +57,35 @@ components:
       contentType: application/json
       payload:
         $ref: '#/components/schemas/parameters_payload'
-        
-
 
   schemas:
     reply_e_mail_payload:
       description: The payload with the information of a reply e-mail.
       type: object
       properties:
-        address:
+        addresses:
           type: array
-          description: The e-mail subject.
+          description: The addresses of the people to receive the reply.
           items:
-            - $ref: '#/components/schemas/reply_e_mail_address_payload'
+            $ref: '#/components/schemas/reply_e_mail_address_payload'
           examples:
-           - [{"type":"TO","address":"info@valawai.eu"}]
+            - [{"type":"TO","address":"info@valawai.eu"}]
         subject:
           type: string
           description: The e-mail subject.
           examples:
-           - Re: How to create a VALAWAI component?
+            - "Re: How to create a VALAWAI component?"
         is_html:
           type: boolean
-          description: This is true if the e-mail content is HTML.
+          description: True if the e-mail content is HTML.
           default: false
           examples:
-           - false
+            - false
         content:
           type: string
           description: The content of the e-mail.
           examples:
-           - Hi! You can find all the information at https://valawai.github.io/docs/
+            - "Hi! You can find all the information at https://valawai.github.io/docs/"
 
     reply_e_mail_address_payload:
       description: Describe the address associated with an e-mail.
@@ -101,52 +99,53 @@ components:
             - CC
             - BCC
           examples:
-           - TO
+            - TO
         name:
           type: string
           description: The name of the user.
           examples:
-           - VALAWAI
+            - VALAWAI
         address:
           type: string
           description: The e-mail address.
           examples:
-           - no-reply@valawai.eu
+            - no-reply@valawai.eu
 
-          
     received_e_mail_payload:
-      description: The payload with the information of a received e-mail.
+      description: The payload containing metadata and content of a received e-mail.
       type: object
       properties:
-        address:
+        addresses:
           type: array
-          description: The e-mail subject.
+          description: List of all participants (senders and recipients) associated with the email.
           items:
-            - $ref: '#/components/schemas/receive_e_mail_address_payload'
+            $ref: '#/components/schemas/received_e_mail_address_payload'
           examples:
-           - [{"type":"FROM","name":"Jane doe","address":"jane.doe@valawai.eu"},{"type":"TO","address":"info@valawai.eu"}]
+            - [{"type":"FROM","name":"Jane doe","address":"jane.doe@valawai.eu"},{"type":"TO","address":"info@valawai.eu"}]
         subject:
           type: string
-          description: The e-mail subject.
+          description: The subject line of the email.
           examples:
-           - How to create a VALAWAI component?
+            - "How to create a VALAWAI component?"
         mime_type:
           type: string
-          description: The MIME type associated with the e-mail content.
+          description: The MIME type of the content (e.g., text/html, text/plain).
+          default: "text/plain"
           examples:
-           - text/plain
+            - text/plain
         content:
           type: string
-          description: The content of the e-mail.
+          description: The actual body content of the email.
           examples:
-           - Hi! I am a new user of the VALAWAI and I do not know how to create a component. Can you help me with it?
+            - "Hi! I am a new user of the VALAWAI and I do not know how to create a component. Can you help me with it?"
         received_at:
           type: integer
-          description: The epoch time, in seconds, when the email is received.
+          minimum: 0
+          description: The Unix epoch timestamp (seconds) when the email was received.
           examples:
-           - 1715342664
+            - 1715342664
 
-    receive_e_mail_address_payload:
+    received_e_mail_address_payload:
       description: Describe the address associated with an e-mail.
       type: object
       properties:
@@ -159,20 +158,25 @@ components:
             - CC
             - BCC
           examples:
-           - FROM
+            - FROM
         name:
           type: string
           description: The name of the user.
           examples:
-           - VALAWAI
+            - VALAWAI
         address:
           type: string
           description: The e-mail address.
           examples:
-           - no-reply@valawai.eu
+            - no-reply@valawai.eu
           
     component_payload:
       type: object
+      required:
+        - id
+        - name
+        - version
+        - api_version
       properties:
         id:
           description: The identifier of the component.
@@ -204,19 +208,18 @@ components:
             - '2.3.0'
         type:
           description: The type level of the component in the VALAWAI.
-          oneOf:
-            - $ref: '#/components/schemas/component_type'
+          $ref: '#/components/schemas/component_type'
         since:
-          description: The epoch time, in seconds, since the component is available in VALAWAI.
+          description: The epoch time, in seconds, since the component has been available in VALAWAI.
           type: integer
           minimum: 0
           examples: 
-            - '1709902001'
+            - 1709902001
         channels:
           description: The channels that the component has.
           type: array
           items:
-            - $ref: '#/components/schemas/channel_schema'
+            $ref: '#/components/schemas/channel_schema'
 
     component_type:
       type: string
@@ -241,12 +244,10 @@ components:
             - 'Provide the audio to convert to text'
         subscribe:
           description: The type of payload that the channel can receive.
-          oneOf:
-            - $ref: '#/components/schemas/payload_schema'
+          $ref: '#/components/schemas/payload_schema'
         publish:
           description: The type of payload that the channel can send.
-          oneOf:
-            - $ref: '#/components/schemas/payload_schema'
+          $ref: '#/components/schemas/payload_schema'
 
     payload_schema:
       type: object
@@ -296,7 +297,7 @@ components:
               type: array
               description: The possible enum values.
               items:
-                - type: string
+                type: string
 
     object_payload_schema:
       description: A definition of a schema that describes an object.
@@ -308,7 +309,7 @@ components:
               const: 'OBJECT'
             id:
               type: integer
-              description: The identifier used when this scheme is referred to by other components.
+              description: The identifier used when this schema is referred to by other components.
             properties:
               description: The properties that define the object.
               additionalProperties:
@@ -326,7 +327,7 @@ components:
               description: The type for the elements on the array.
               type: array
               items:
-                - $ref: '#/components/schemas/payload_schema'
+                $ref: '#/components/schemas/payload_schema'
 
     constant_payload_schema:
       description: A payload that is a constant value.
@@ -350,7 +351,7 @@ components:
               const: 'REF'
             value:
               type: integer
-              description: The identifier of the schema that this a reference.
+              description: The identifier of the schema that this is a reference to.
 
     one_of_payload_schema:
       description: A payload that is one of the possible schemas.
@@ -364,7 +365,7 @@ components:
               description: The possible schemas.
               type: array
               items:
-                - $ref: '#/components/schemas/payload_schema'
+                $ref: '#/components/schemas/payload_schema'
 
     any_of_payload_schema:
       description: A payload that is any of the possible schemas.
@@ -378,7 +379,7 @@ components:
               description: The possible schemas.
               type: array
               items:
-                - $ref: '#/components/schemas/payload_schema'
+                $ref: '#/components/schemas/payload_schema'
 
     all_of_payload_schema:
       description: A payload that is a set of schemas.
@@ -389,10 +390,10 @@ components:
             type:
               const: 'ALL_OF'
             items:
-              description: The schemas that has to match.
+              description: The schemas that have to match.
               type: array
               items:
-                - $ref: '#/components/schemas/payload_schema'
+                $ref: '#/components/schemas/payload_schema'
 
     parameters_payload:
       description: The parameters that can change the component behaviour
