@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN --mount=type=cache,target=/root/.cache/pip pip install -U "huggingface_hub"
 
 RUN --mount=type=cache,target=/root/.cache/huggingface hf download $LLM_MODEL 
-	
+
 WORKDIR /build
 COPY pyproject.toml .
 COPY LICENSE .

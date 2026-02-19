@@ -1,5 +1,5 @@
 # 
-# This file is part of the C1_llm_emial_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
+# This file is part of the C1_llm_email_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,8 @@
 #
 
 import unittest
+import json
+from pydantic_core import from_json
 
 from json_resources import load_reply_e_mail_payload_json
 from pydantic import ValidationError
@@ -33,7 +35,7 @@ class TestReplyEMailPayload(unittest.TestCase):
 		"""Test can obtain a reply_e_mail_payload from a json"""
 
 		json_dict = load_reply_e_mail_payload_json()
-		reply_e_mail_payload = ReplyEMailPayload(**json_dict)
+		reply_e_mail_payload = ReplyEMailPayload.model_validate(json_dict)
 		assert len(reply_e_mail_payload.addresses) == 1
 		assert reply_e_mail_payload.addresses[0].address_type == "TO"
 		assert reply_e_mail_payload.addresses[0].name == "Jon Doe"
@@ -42,18 +44,30 @@ class TestReplyEMailPayload(unittest.TestCase):
 		assert reply_e_mail_payload.is_html == False
 		assert reply_e_mail_payload.content == "Hi Jane,\n\nYou can find all the information at https://valawai.github.io/docs/\n\nBest regards,\nJon"
 		
+	def test_save_json(self):
+		"""Test can obtain a reply_e_mail_payload from a json"""
 
-	def test_allow_define_empty_reply_e_mail_payload(self):
-		"""Test can create an empty reply_e_mail_payload"""
+		json_dict = load_reply_e_mail_payload_json()
+		reply_e_mail_payload = ReplyEMailPayload.model_validate(json_dict)
+		json_str = reply_e_mail_payload.model_dump_json()
+		json_dict2 = from_json(json_str, allow_partial=True)
+		
+		assert json_dict == json_dict2
 
-		reply_e_mail_payload = ReplyEMailPayload()
-		assert reply_e_mail_payload is not None
+	def test_fail_load_empty_json(self):
+		"""Test can not load a treatment from an empty json"""
 
-	def test_load_empty_json(self):
-		"""Test can not load a change parameters payload from an empty json"""
+		error = False
+		try:
 
-		reply_e_mail_payload = ReplyEMailPayload()
-		assert reply_e_mail_payload is not None
+			treatment = ReplyEMailPayload(**{})
+			assert treatment is None
+
+		except ValidationError:
+			error = True
+
+		# Can create empty treatment
+		assert error
 
 	def test_fail_load_reply_e_mail_payload_without_bad_field_value(self):
 		"""Test can not load a reply_e_mail_payload without identifier"""

@@ -1,5 +1,5 @@
 # 
-# This file is part of the C1_llm_emial_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
+# This file is part of the C1_llm_email_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,49 +22,47 @@ import logging.config
 import os
 import signal
 
-from change_parameters_handler import ChangeParametersHandler
-from message_service import MessageService
-from mov import MOV
-from received_treatment_handler import ReceivedTreatmentHandler
+from .change_parameters_handler import ChangeParametersHandler
+from .message_service import MessageService
+from .mov import MOV
+from .received_e_mail_handler import ReceivedEMailHandler
 
 
 class App:
     """The class used as application of the C1 LLM E-Mail replier"""
 
     def __init__(self):
-        """Initilaize the application"""
+        """Initialize the application"""
+        self.message_service = None
+        self.mov = None
 
         # Capture when the docker container is stopped
         signal.signal(signal.SIGINT, self.exit_gracefully)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     def exit_gracefully(self, _signum, _frame):
-        """Called when the docker container is closed
-        """
+        """Called when the docker container is closed"""
         self.stop()
 
     def stop(self):
         """Finalize the component."""
-
         try:
-
-            self.mov.unregister_component()
-            self.message_service.close()
+            if self.mov:
+                self.mov.unregister_component()
+            if self.message_service:
+                self.message_service.close()
             logging.info("Finished C1 LLM E-Mail Replier")
-
         except (OSError, ValueError):
-
             logging.exception("Could not stop the component")
 
     def start(self):
         """Initialize the component"""
-
         try:
             # Create connection to RabbitMQ
             self.message_service = MessageService()
             self.mov = MOV(self.message_service)
 
-            # Create the handlers for the events 
+            # Create the handlers for the events
             ReceivedEMailHandler(self.message_service, self.mov)
             ChangeParametersHandler(self.message_service, self.mov)
 
@@ -76,7 +74,6 @@ class App:
             self.message_service.start_consuming()
 
         except (OSError, ValueError):
-
             logging.exception("Could not start the component")
 
 

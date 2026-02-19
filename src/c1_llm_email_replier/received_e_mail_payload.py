@@ -1,5 +1,5 @@
 # 
-# This file is part of the C1_llm_emial_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
+# This file is part of the C1_llm_email_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from received_e_mail_address_payload import ReceivedEMailAddressPayload
 
 class ReceivedEMailPayload(BaseModel):
 	"""The payload containing metadata and content of a received e-mail."""
 
-	addresses: list[ReceivedEMailAddressPayload] = Field(default_factory=list, title="List of all participants (sender and recipients) associated with the email.")
+	addresses: list[ReceivedEMailAddressPayload] = Field(min_length=1,title="List of all participants (sender and recipients) associated with the email.")
 	subject: str | None = Field(default=None, title="The subject line of the email.")
 	mime_type: str | None = Field(default=None, title="The MIME type of the content (e.g., text/html, text/plain).")
 	content: str | None = Field(default=None, title="The actual body content of the email.")
 	received_at: int | None = Field(default=None, title="The Unix epoch timestamp (seconds) when the email was received.")
+
+	model_config = ConfigDict(serialize_by_alias=True,populate_by_name=True)

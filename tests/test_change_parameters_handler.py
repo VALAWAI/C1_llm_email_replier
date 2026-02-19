@@ -1,5 +1,5 @@
 # 
-# This file is part of the C1_llm_emial_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
+# This file is part of the C1_llm_email_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -168,7 +168,6 @@ class TestChangeParametersHandler(unittest.TestCase):
     """
     
     temperature = 0.7 + 0.001 * random.randrange(1, 99, 1)
-    print(temperature)
     parameters = {
       'temperature':temperature
     }

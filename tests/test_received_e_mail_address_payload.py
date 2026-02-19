@@ -1,5 +1,5 @@
 # 
-# This file is part of the C1_llm_emial_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
+# This file is part of the C1_llm_email_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 #
 
 import unittest
+import json
 
 from json_resources import load_received_e_mail_address_payload_json
 from pydantic import ValidationError
@@ -37,6 +38,16 @@ class TestReceivedEMailAddressPayload(unittest.TestCase):
 		assert received_e_mail_address_payload.address_type == "FROM"
 		assert received_e_mail_address_payload.name == "Jane Doe"
 		assert received_e_mail_address_payload.address == "jane_doe@valawai.eu"
+
+	def test_save_json(self):
+		"""Test can obtain a received_e_mail_address_payload from a json"""
+
+		json_dict = load_received_e_mail_address_payload_json()
+		received_e_mail_address_payload = ReceivedEMailAddressPayload(**json_dict)
+		json_str = received_e_mail_address_payload.model_dump_json()
+		json_dict2 = json.loads(json_str)
+		
+		assert json_dict == json_dict2
 
 	def test_allow_define_empty_received_e_mail_address_payload(self):
 		"""Test can create an empty received_e_mail_address_payload"""

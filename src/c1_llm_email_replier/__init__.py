@@ -1,5 +1,5 @@
 # 
-# This file is part of the C1_llm_emial_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
+# This file is part of the C1_llm_email_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -18,5 +18,7 @@
 
 import os
 import sys
+
+__version__ = "1.2.0"
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))

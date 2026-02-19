@@ -1,5 +1,5 @@
 # 
-# This file is part of the C1_llm_emial_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
+# This file is part of the C1_llm_email_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,21 @@
 #
 
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
-class ReceiveEMailAddressType(str, Enum):
+class ReceivedEMailAddressType(str, Enum):
+    """The type of address associated with a received e-mail.
+    """
     FROM = "FROM"
     TO = "TO"
     CC = "CC"
     BCC = "BCC"
 
 class ReceivedEMailAddressPayload(BaseModel):
-	"""Describe the address associated with an e-mail."""
-
-	address_type: ReceiveEMailAddressType | None = Field(default=None, alias="type", title="The type of address.")
-	name: str | None = Field(default=None, title="The name of the user."),
-	address: str | None = Field(default=None, title="The e-mail address.")
+    """Describe the address associated with a received e-mail."""
+    
+    address_type: ReceivedEMailAddressType | None = Field(default=None, alias="type", title="The type of address.")
+    name: str | None = Field(default=None, title="The name of the user.")
+    address: str | None = Field(default=None, title="The e-mail address.")
+    
+    model_config = ConfigDict(serialize_by_alias=True, populate_by_name=True)

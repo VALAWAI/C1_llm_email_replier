@@ -2,10 +2,9 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-
 [project]
 name = "C1_LLM_EMail_replier"
-version = "1.2.0"
+dynamic = ["version"]
 description = "C1 component that generate a reply to an e-mail using a LLM."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -19,13 +18,13 @@ classifiers = [
   "Programming Language :: Python :: 3.10"
 ]
 dependencies = [
-    "torch>=2.4.0",
-    "transformers>=4.44.2",
-    "accelerate>=0.33.0",
-    "html2text>=2024.2.26",
-	"pika>=1.3.2",
-	"pydantic >= 2.11.4"
-	]
+  "torch>=2.4.0",
+  "transformers>=4.44.2",
+  "accelerate>=0.33.0",
+  "html2text>=2024.2.26",
+  "pika>=1.3.2",
+  "pydantic>=2.11.4"
+]
 
 [project.urls]
 "Documentation" = "https://valawai.github.io/docs/components/C1/llm_email_replier"
@@ -33,34 +32,39 @@ dependencies = [
 "Source" = "https://github.com/VALAWAI/C1_llm_email_replier/tree/main"
 
 [tool.hatch.version]
-path = "c1_llm_email_replier/__init__.py"
+path = "src/c1_llm_email_replier/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/c1_llm_email_replier",
+  "src/c1_llm_email_replier",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "src/c1_llm_email_replier",
 ]
 
 [tool.pytest.ini_options]
 addopts = [
-    "--import-mode=importlib",
-	]
-	
+  "--import-mode=importlib",
+]
+
 [tool.hatch.envs.test]
 dependencies = [
-	"pytest>=8.3.5",
-	"coverage>=7.8.0"
-	]
-	
+  "pytest>=8.3.5",
+  "coverage>=7.8.0"
+]
+
 [tool.hatch.envs.hatch-test]
 extra-dependencies = [
-	"requests>=2.32.3",
-	"unittest-parametrize>=1.6.0"
-	]
-	
+  "requests>=2.32.3",
+  "unittest-parametrize>=1.6.0"
+]
+
 [tool.coverage.run]
 omit = [
-    "tests/*"
-	]
+  "tests/*"
+]
 
 [tool.coverage.report]
 show_missing = true

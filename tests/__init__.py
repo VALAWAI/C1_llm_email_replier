@@ -1,6 +1,6 @@
 #
-# This file is part of the C1_llm_emial_replier distribution
-# (https://github.com/VALAWAI/C1_llm_emial_replier).
+# This file is part of the C1_llm_email_replier distribution
+# (https://github.com/VALAWAI/C1_llm_\Cemail_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,9 @@
 import logging
 import os
 import sys
+
+# Ensure src is in the path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 test_path = os.path.dirname(os.path.realpath(__file__))
 if test_path not in sys.path:
