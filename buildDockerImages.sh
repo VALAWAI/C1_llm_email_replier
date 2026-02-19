@@ -5,7 +5,7 @@ if ! docker stats --no-stream >/dev/null 2>&1; then
 else
 	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 	pushd $DIR > /dev/null
-	TAG=$(grep --max-count=1 "version" pyproject.toml  | awk -F "\"" '{ print $2 }')
+	TAG=$(grep --max-count=1 "__version__" src/c1_llm_email_replier/__init__.py  | awk -F "\"" '{ print $2 }')
 
 	DOCKER_ARGS=""
 	PLATFORMS=""
