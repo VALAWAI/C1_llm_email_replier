@@ -56,12 +56,12 @@ class ReceivedEMailHandler:
         """
 
         try:
-            # Handle potential double-encoding from Pika
+            # Handle potential double-encoding from RabbitMQ/Pika
             try:
-                # model_validate_json handles bytes or single-encoded strings
+                # model_validate_json handles bytes or single-encoded JSON strings
                 e_mail = ReceivedEMailPayload.model_validate_json(body)
             except Exception:
-                # If it fails, the body might be a double-encoded string
+                # Fallback: if body is double-encoded, it might be a JSON string inside a JSON string
                 data = json.loads(body)
                 if isinstance(data, str):
                     data = json.loads(data)
@@ -69,50 +69,59 @@ class ReceivedEMailHandler:
 
             self.mov.info("Received an e-mail", e_mail)
 
-            reply_addresses: list[dict] = []
-            for address in e_mail.addresses:
-                # address_type is a ReceivedEMailAddressType Enum
-                if address.address_type is not None and address.address is not None:
-                    # Use .value for string comparison if needed, or compare to Enum members
-                    if address.address_type != ReceivedEMailAddressType.TO:
+            # Map received addresses to reply addresses
+            reply_addresses: List[dict] = []
+            for addr in e_mail.addresses:
+                # We skip TO addresses from the original email as they are likely the component's own address
+                if addr.address_type == ReceivedEMailAddressType.TO:
+                    continue
 
-                        address_type = ReplyEMailAddressType.TO
-                        if address.address_type == ReceivedEMailAddressType.BCC:
-                            address_type = ReplyEMailAddressType.BCC
-                        elif address.address_type == ReceivedEMailAddressType.CC:
-                            address_type = ReplyEMailAddressType.CC
+                # Map Original Address Type -> Reply Address Type
+                # FROM in original email becomes TO in the reply
+                # CC and BCC stay the same
+                reply_type = ReplyEMailAddressType.TO
+                if addr.address_type == ReceivedEMailAddressType.CC:
+                    reply_type = ReplyEMailAddressType.CC
+                elif addr.address_type == ReceivedEMailAddressType.BCC:
+                    reply_type = ReplyEMailAddressType.BCC
 
-                        reply_to = ReplyEMailAddressPayload(**{
-                            "type": address_type,
-                            "address": address.address,
-                            "name": address.name
-                        }).model_dump()
-                        reply_addresses.append(reply_to)
+                reply_to = ReplyEMailAddressPayload(
+                    type=reply_type,
+                    address=addr.address,
+                    name=addr.name
+                ).model_dump()
+                reply_addresses.append(reply_to)
 
-            if len(reply_addresses) == 0:
-                self.mov.error("No specified the address of the user to reply", e_mail)
+            if not reply_addresses:
+                self.mov.error("No valid addresses found to reply to", e_mail)
                 return
 
-            # Access attributes via dot notation, not dictionary keys
-            subject = e_mail.subject if e_mail.subject is not None else "No subject"
-            content = e_mail.content if e_mail.content is not None else "No content"
+            # Prepare content for generation
+            subject = e_mail.subject or "No subject"
+            content = e_mail.content or "No content"
 
+            # Convert HTML to Markdown if necessary
             if e_mail.mime_type == "text/html":
                 converter = html2text.HTML2Text()
                 converter.ignore_links = True
                 content = converter.handle(content)
 
+            # Generate the reply
             self.generator.refresh_parameters()
             reply_subject, reply_content = self.generator.generate_reply(subject, content)
-            reply_msg = ReplyEMailPayload(**{
-                "addresses": reply_addresses,
-                "subject": reply_subject,
-                "is_html": False,
-                "content": reply_content
-            })
+
+            # Construct and send the reply payload
+            reply_msg = ReplyEMailPayload(
+                addresses=reply_addresses,
+                subject=reply_subject,
+                is_html=False,
+                content=reply_content
+            )
             self.message_service.publish_to(self.REPLY_EMAIL_TOPIC, reply_msg)
             self.mov.info("Sent reply to e-mail", reply_msg)
 
         except Exception as error:
-            msg = f"Cannot process the received message, because {error}"
+            # Enhanced error logging with body snippet
+            body_snippet = body[:100].decode('utf-8', errors='replace') if body else "None"
+            msg = f"Failed to process message: {error}. Body start: {body_snippet}..."
             self.mov.error(msg, body)

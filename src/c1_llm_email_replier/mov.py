@@ -155,30 +155,32 @@ class MOV:
         Parameters
         ----------
         level : str
-            The log level
+            The log level (DEBUG, INFO, WARN, ERROR)
         msg : str
             The log message
-        payload: object
-            The payload associated to the log message.
+        payload: object, optional
+            The payload associated with the log message.
         """
 
-        # MOV treats {…} as template placeholders, so strip braces from the message.
-        msg = msg.replace("{", " ").replace("}", " ")
-        add_log_payload = {"level": level, "message": msg}
+        # MOV treats {…} as template placeholders, so we strip braces from the message
+        # to prevent accidental placeholder expansion or errors on the MOV side.
+        safe_msg = msg.replace("{", "[").replace("}", "]")
+        add_log_payload = {"level": level, "message": safe_msg}
 
         if payload is not None:
-            if isinstance(payload, str):
-                add_log_payload["payload"] = payload
+            if isinstance(payload, BaseModel):
+                add_log_payload["payload"] = payload.model_dump_json()
+            elif isinstance(payload, (dict, list)):
+                add_log_payload["payload"] = json.dumps(payload)
             elif isinstance(payload, bytes):
-                add_log_payload["payload"] = payload.decode('utf-8')
+                add_log_payload["payload"] = payload.decode('utf-8', errors='replace')
+            elif isinstance(payload, str):
+                add_log_payload["payload"] = payload
             else:
                 try:
-                    if isinstance(payload, BaseModel):
-                        add_log_payload["payload"] = payload.model_dump_json()
-                    else:
-                        add_log_payload["payload"] = json.dumps(payload)
+                    add_log_payload["payload"] = json.dumps(payload)
                 except (TypeError, ValueError):
-                    logging.exception("Could not serialize payload to JSON; falling back to str()")
+                    logging.debug("Could not serialize payload to JSON; falling back to str()")
                     add_log_payload["payload"] = str(payload)
 
         if self.component_id is not None:

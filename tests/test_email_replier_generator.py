@@ -84,8 +84,8 @@ class TestEMailReplierGenerator(unittest.TestCase):
         mock_pipe = MagicMock()
         mock_pipeline.return_value = mock_pipe
         
-        # Mocking the output of the pipeline
-        mock_pipe.return_value = [{"generated_text": "Hello <|assistant|> Subject: Test\nContent of the reply"}]
+        # Mocking the output of the pipeline (now returning only generated part)
+        mock_pipe.return_value = [{"generated_text": "Subject: Test\nContent of the reply"}]
         mock_pipe.tokenizer.apply_chat_template.return_value = "Mocked prompt"
         
         generator = EMailReplierGenerator(model_id="test-model")
