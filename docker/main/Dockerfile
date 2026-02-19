@@ -31,6 +31,7 @@ ENV REPLY_MAX_NEW_TOKENS=256.
 ENV REPLY_TEMPERATURE=0.7
 ENV REPLY_TOP_K=50
 ENV REPLY_TOP_P=0.95
+ENV REPLY_MAX_WORKERS=1
 ENV REPLY_SYSTEM_PROMPT="You are a polite chatbot who always try to provide solutions to the customers problems."
 
 ENV LOG_CONSOLE_LEVEL=DEBUG

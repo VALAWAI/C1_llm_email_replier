@@ -67,22 +67,47 @@ class MessageService:
         self.port = port
         self.listen_connection: Optional[pika.BlockingConnection] = None
         self.listen_channel: Any = None
-        self.connection_params = pika.ConnectionParameters(host=self.host, port=self.port, credentials=self.credentials)
+        self.connection_params = pika.ConnectionParameters(
+            host=self.host, 
+            port=self.port, 
+            credentials=self.credentials,
+            heartbeat=int(os.getenv('RABBITMQ_HEARTBEAT', "600")) # Higher heartbeat to survive LLM generation
+        )
+        self.max_retries = max_retries
+        self.retry_sleep_seconds = retry_sleep_seconds
+        self.listeners: list[tuple[str, Callable]] = []
+        self._stopping = False
 
-        for attempt in range(max_retries):
+        self._connect()
+
+    def _connect(self) -> None:
+        """Establish the connection to RabbitMQ with retries."""
+        for attempt in range(self.max_retries):
             try:
+                if self.listen_connection is not None and self.listen_connection.is_open:
+                    return
+
                 self.listen_connection = pika.BlockingConnection(self.connection_params)
                 self.listen_channel = self.listen_connection.channel()
+                
+                # Re-apply listeners if any
+                for queue, callback in self.listeners:
+                    self._apply_listener(queue, callback)
+                
+                logging.info(f"Connected to RabbitMQ at {self.host}:{self.port}")
                 return
-            except (OSError, pika.exceptions.AMQPError):
-                logging.warning("Cannot connect to RabbitMQ (attempt %d/%d), retrying...", attempt + 1, max_retries)
-                time.sleep(retry_sleep_seconds)
+            except (OSError, pika.exceptions.AMQPError) as error:
+                logging.warning(f"Cannot connect to RabbitMQ (attempt {attempt + 1}/{self.max_retries}) because {error}. Retrying in {self.retry_sleep_seconds}s...")
+                time.sleep(self.retry_sleep_seconds)
 
-        raise ValueError(f"Cannot connect to RabbitMQ at {host}:{port} after {max_retries} attempts")
+        raise ValueError(f"Cannot connect to RabbitMQ at {self.host}:{self.port} after {self.max_retries} attempts")
 
     def close(self) -> None:
         """Close the connection."""
+        self._stopping = True
         try:
+            if self.listen_channel is not None and self.listen_channel.is_open:
+                self.listen_channel.stop_consuming()
             if self.listen_connection is not None and self.listen_connection.is_open:
                 self.listen_connection.close()
         except (OSError, pika.exceptions.AMQPError):
@@ -100,9 +125,14 @@ class MessageService:
         callback: method
             The method to call when a message is received.
         """
+        self.listeners.append((queue, callback))
+        self._apply_listener(queue, callback)
+
+    def _apply_listener(self, queue: str, callback: Callable) -> None:
+        """Actually register the listener on the channel."""
         self.listen_channel.queue_declare(queue=queue, durable=True, exclusive=False, auto_delete=False)
         self.listen_channel.basic_consume(queue=queue, auto_ack=True, on_message_callback=callback)
-        logging.debug("Listen for the queue %s", queue)
+        logging.debug(f"Listen for the queue {queue}")
 
     def publish_to(self, queue: str, msg: Any) -> None:
         """Publish a message to a queue.
@@ -131,24 +161,35 @@ class MessageService:
                         body=body,
                         properties=properties,
                     )
-            logging.debug("Publish message to the queue %s", queue)
+            logging.debug(f"Publish message to the queue {queue}")
 
         except (OSError, pika.exceptions.AMQPError):
-            logging.exception("Cannot publish a msg in the queue %s", queue)
+            logging.exception(f"Cannot publish a msg in the queue {queue}")
         except (TypeError, ValueError):
             logging.exception("Cannot publish a msg because the message could not be encoded")
 
     def start_consuming(self) -> None:
-        """Start to consume the messages."""
-        try:
-            logging.info("Start listening for events")
-            self.listen_channel.start_consuming()
-        except KeyboardInterrupt:
-            logging.info("Stop listening for events")
-        except pika.exceptions.AMQPError:
-            logging.info("Closed connection")
-        except BaseException:
-            logging.exception("Consuming messages error.")
+        """Start to consume the messages with automatic reconnection."""
+        while not self._stopping:
+            try:
+                self._connect()
+                logging.info(f"Start listening for events on {self.host}:{self.port}")
+                self.listen_channel.start_consuming()
+            except KeyboardInterrupt:
+                logging.info(f"Stop listening for events on {self.host}:{self.port}")
+                self.close()
+            except (pika.exceptions.AMQPError, pika.exceptions.ConnectionClosedByBroker) as error:
+                if self._stopping:
+                    break
+                logging.warning(f"Connection lost to RabbitMQ at {self.host}:{self.port} ({error}). Reconnecting...")
+                self.listen_connection = None # Force reconnection
+                time.sleep(self.retry_sleep_seconds)
+            except BaseException as error:
+                if self._stopping:
+                    break
+                logging.exception(f"Consuming messages error from RabbitMQ at {self.host}:{self.port} because {error}. Reconnecting...")
+                self.listen_connection = None # Force reconnection
+                time.sleep(self.retry_sleep_seconds)
 
     def start_consuming_and_forget(self) -> None:
         """Start consuming messages in a background daemon thread."""

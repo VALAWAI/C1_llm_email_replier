@@ -16,9 +16,11 @@
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #
 
+import os
 import json
-from typing import Any, List
+from typing import List
 import html2text
+from concurrent.futures import ThreadPoolExecutor
 
 from c1_llm_email_replier.message_service import MessageService
 from c1_llm_email_replier.mov import MOV
@@ -49,9 +51,21 @@ class ReceivedEMailHandler:
         self.message_service = message_service
         self.mov = mov
         self.generator = EMailReplierGenerator()
+        
+        # Use a thread pool to process messages off-thread
+        # this prevents the LLM generation from blocking the RabbitMQ heartbeat
+        max_workers = int(os.getenv('REPLY_MAX_WORKERS', '1'))
+        if max_workers < 1:
+            max_workers = 1
+        self.executor = ThreadPoolExecutor(max_workers=max_workers)
+        
         self.message_service.listen_for(self.RECEIVED_EMAIL_TOPIC, self.handle_message)
 
-    def handle_message(self, _ch, _method, _properties, body: bytes) -> None:
+    def handle_message(self, ch, method, properties, body: bytes) -> None:
+        """Receive RabbitMQ messages and offload them to the executor thread."""
+        self.executor.submit(self._handle_message_task, body)
+
+    def _handle_message_task(self, body: bytes) -> None:
         """Manage the received messages on the channel valawai/c1/llm_email_replier/data/received_e_mail
         """
 
@@ -118,7 +132,7 @@ class ReceivedEMailHandler:
                 content=reply_content
             )
             self.message_service.publish_to(self.REPLY_EMAIL_TOPIC, reply_msg)
-            self.mov.info("Sent reply to e-mail", reply_msg)
+            self.mov.info("Sent e-mail reply", reply_msg)
 
         except Exception as error:
             # Enhanced error logging with body snippet
