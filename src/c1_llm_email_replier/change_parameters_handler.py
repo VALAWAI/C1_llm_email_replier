@@ -21,9 +21,9 @@ import logging
 import os
 from typing import Any, Union
 
-from .change_parameters_payload import ChangeParametersPayload
-from .message_service import MessageService
-from .mov import MOV
+from c1_llm_email_replier.change_parameters_payload import ChangeParametersPayload
+from c1_llm_email_replier.message_service import MessageService
+from c1_llm_email_replier.mov import MOV
 
 
 class ChangeParametersHandler:

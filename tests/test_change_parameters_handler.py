@@ -84,6 +84,7 @@ class TestChangeParametersHandler(unittest.TestCase):
     random.random()
     parameters = {
       'max_new_tokens': 256.0 + random.randrange(11, 111, 1),
+      'min_new_tokens':  random.randrange(0, 111, 1),
       'temperature': 0.7 + 0.001 * random.randrange(1, 100, 1),
       'top_k': 40.0 + random.randrange(1, 21, 1),
       'top_p': 0.9 + 0.001 * random.randrange(1, 99, 1),
@@ -135,6 +136,44 @@ class TestChangeParametersHandler(unittest.TestCase):
     }
     self.__assert_process_change_parameters('INFO', parameters)
     self.assertEqual(str(max_new_tokens), os.getenv("REPLY_MAX_NEW_TOKENS"))
+
+  def test_not_change_min_new_tokens_with_a_bad_value(self):
+    """Check that the handler not change the 'min_new_tokens' when it is not valid
+    """
+    
+    parameters = {
+      'min_new_tokens':str(uuid.uuid4())
+    }
+    self.__assert_process_change_parameters('ERROR', parameters)
+
+  def test_not_change_min_new_tokens_with_a_low_value(self):
+    """Check that the handler not change the 'min_new_tokens' if the value is too low
+    """
+    
+    parameters = {
+      'min_new_tokens': -1.0*random.randrange(0, 99, 1)
+    }
+    self.__assert_process_change_parameters('ERROR', parameters)
+
+  def test_not_change_min_new_tokens_with_a_hight_value(self):
+    """Check that the handler not change the 'min_new_tokens' if the value is too hight
+    """
+    
+    parameters = {
+      'min_new_tokens': 1.0*random.randrange(1001, 2000, 1)
+    }
+    self.__assert_process_change_parameters('ERROR', parameters)
+
+  def test_change_min_new_tokens(self):
+    """Check that the handler change the 'min_new_tokens'
+    """
+    
+    min_new_tokens = 1.0*random.randrange(0, 111, 1)
+    parameters = {
+      'min_new_tokens':min_new_tokens
+    }
+    self.__assert_process_change_parameters('INFO', parameters)
+    self.assertEqual(str(min_new_tokens), os.getenv("REPLY_MIN_NEW_TOKENS"))
 
   def test_not_change_temperature_with_a_bad_value(self):
     """Check that the handler not change the 'temperature' when it is not valid

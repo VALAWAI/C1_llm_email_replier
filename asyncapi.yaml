@@ -406,6 +406,13 @@ components:
           maximum: 1000
           examples:
             - 256
+        min_new_tokens:
+          description: The minimum number of tokens to generate.
+          type: integer
+          minimum: 0
+          maximum: 1000
+          examples:
+            - 6
         temperature:
           description: The value used to modulate the next token probabilities.
           type: number
