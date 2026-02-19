@@ -67,16 +67,12 @@ class MessageService:
         self.port = port
         self.listen_connection: Optional[pika.BlockingConnection] = None
         self.listen_channel: Any = None
-        self.publish_connection: Optional[pika.BlockingConnection] = None
-        self.publish_channel: Any = None
+        self.connection_params = pika.ConnectionParameters(host=self.host, port=self.port, credentials=self.credentials)
 
         for attempt in range(max_retries):
             try:
-                params = pika.ConnectionParameters(host=self.host, port=self.port, credentials=self.credentials)
-                self.listen_connection = pika.BlockingConnection(params)
+                self.listen_connection = pika.BlockingConnection(self.connection_params)
                 self.listen_channel = self.listen_connection.channel()
-                self.publish_connection = pika.BlockingConnection(params)
-                self.publish_channel = self.publish_connection.channel()
                 return
             except (OSError, pika.exceptions.AMQPError):
                 logging.warning("Cannot connect to RabbitMQ (attempt %d/%d), retrying...", attempt + 1, max_retries)
@@ -85,15 +81,14 @@ class MessageService:
         raise ValueError(f"Cannot connect to RabbitMQ at {host}:{port} after {max_retries} attempts")
 
     def close(self) -> None:
-        """Close the connections."""
-        for conn in (self.listen_connection, self.publish_connection):
-            try:
-                if conn is not None and conn.is_open:
-                    conn.close()
-            except (OSError, pika.exceptions.AMQPError):
-                logging.exception("Cannot close a connection to RabbitMQ")
-            except BaseException:
-                logging.exception("Unexpected error closing RabbitMQ connection")
+        """Close the connection."""
+        try:
+            if self.listen_connection is not None and self.listen_connection.is_open:
+                self.listen_connection.close()
+        except (OSError, pika.exceptions.AMQPError):
+            logging.exception("Cannot close the connection to RabbitMQ")
+        except BaseException:
+            logging.exception("Unexpected error closing RabbitMQ connection")
 
     def listen_for(self, queue: str, callback: Callable) -> None:
         """Register a listener on a queue.
@@ -126,12 +121,16 @@ class MessageService:
                 body = json.dumps(msg)
 
             properties = pika.BasicProperties(content_type='application/json')
-            self.publish_channel.basic_publish(
-                exchange='',
-                routing_key=queue,
-                body=body,
-                properties=properties,
-            )
+
+            # Create an on-demand connection for publishing
+            with pika.BlockingConnection(self.connection_params) as publish_connection:
+                with publish_connection.channel() as publish_channel:
+                    publish_channel.basic_publish(
+                        exchange='',
+                        routing_key=queue,
+                        body=body,
+                        properties=properties,
+                    )
             logging.debug("Publish message to the queue %s", queue)
 
         except (OSError, pika.exceptions.AMQPError):
