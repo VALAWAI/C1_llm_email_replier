@@ -14,7 +14,7 @@ and length) and defining a specific "persona" through a system prompt.
 - **Documentation**: [https://valawai.github.io/docs/components/C1/llm_email_replier](https://valawai.github.io/docs/components/C1/llm_email_replier)
 - **Versions**:
   - **Stable version**: [1.2.0 (February 19, 2026)](https://github.com/VALAWAI/C1_llm_email_replier/tree/1.2.0)
-  - **API**: [1.1.0 (February 19, 2026)](https://raw.githubusercontent.com/VALAWAI/C1_llm_email_replier/ASYNCAPI_1.1.0/asyncapi.yml)
+  - **API**: [1.1.0 (February 19, 2026)](https://raw.githubusercontent.com/VALAWAI/C1_llm_email_replier/ASYNCAPI_1.1.0/asyncapi.yaml)
   - **Required MOV API**: [1.2.0 (March 9, 2024)](https://raw.githubusercontent.com/valawai/MOV/ASYNCAPI_1.2.0/asyncapi.yml)
 - **Developed By**: [IIIA-CSIC](https://www.iiia.csic.es)
 - **License**: [GPL v3](LICENSE)
