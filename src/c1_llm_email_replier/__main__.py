@@ -22,10 +22,10 @@ import logging.config
 import os
 import signal
 
-from .change_parameters_handler import ChangeParametersHandler
-from .message_service import MessageService
-from .mov import MOV
-from .received_e_mail_handler import ReceivedEMailHandler
+from c1_llm_email_replier.change_parameters_handler import ChangeParametersHandler
+from c1_llm_email_replier.message_service import MessageService
+from c1_llm_email_replier.mov import MOV
+from c1_llm_email_replier.received_e_mail_handler import ReceivedEMailHandler
 
 
 class App:

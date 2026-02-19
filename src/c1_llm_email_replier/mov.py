@@ -4,8 +4,8 @@ import logging
 import os.path
 from typing import Any, Optional, Dict
 
-from .message_service import MessageService
-from . import __version__
+from c1_llm_email_replier.message_service import MessageService
+from c1_llm_email_replier import __version__
 
 
 class MOV:

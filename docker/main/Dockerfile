@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 RUN --mount=type=cache,target=/root/.cache/pip pip install -U "huggingface_hub"
 
 RUN --mount=type=cache,target=/root/.cache/huggingface hf download $LLM_MODEL 
-	
+
 WORKDIR /app
 
 COPY pyproject.toml .
@@ -40,4 +40,5 @@ ENV LOG_FILE_BACKUP_COUNT=5
 
 HEALTHCHECK CMD test -s /app/{$LOG_DIR:-logs}/{$COMPONET_ID_FILE_NAME:-component_id.json}
 
-CMD ["python", "src/c1_llm_email_replier"]
+ENV PYTHONPATH=/app/src
+CMD ["python", "-m", "c1_llm_email_replier"]

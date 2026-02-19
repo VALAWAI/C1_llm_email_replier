@@ -21,7 +21,7 @@ import logging
 import os
 import time
 from threading import Thread
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 from pydantic import BaseModel
 
 import pika

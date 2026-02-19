@@ -20,13 +20,13 @@ import json
 from typing import Any, List
 import html2text
 
-from .message_service import MessageService
-from .mov import MOV
-from .email_replier_generator import EMailReplierGenerator
-from .received_e_mail_payload import ReceivedEMailPayload
-from .received_e_mail_address_payload import ReceivedEMailAddressType
-from .reply_e_mail_payload import ReplyEMailPayload
-from .reply_e_mail_address_payload import ReplyEMailAddressType, ReplyEMailAddressPayload
+from c1_llm_email_replier.message_service import MessageService
+from c1_llm_email_replier.mov import MOV
+from c1_llm_email_replier.email_replier_generator import EMailReplierGenerator
+from c1_llm_email_replier.received_e_mail_payload import ReceivedEMailPayload
+from c1_llm_email_replier.received_e_mail_address_payload import ReceivedEMailAddressType
+from c1_llm_email_replier.reply_e_mail_payload import ReplyEMailPayload
+from c1_llm_email_replier.reply_e_mail_address_payload import ReplyEMailAddressType, ReplyEMailAddressPayload
 
 
 class ReceivedEMailHandler:
