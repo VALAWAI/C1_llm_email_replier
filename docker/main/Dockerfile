@@ -13,7 +13,6 @@ RUN --mount=type=cache,target=/root/.cache/huggingface hf download $LLM_MODEL
 WORKDIR /app
 
 COPY pyproject.toml .
-COPY requirements.txt .
 COPY LICENSE .
 COPY *.md .
 COPY asyncapi.yaml .

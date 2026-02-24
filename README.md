@@ -10,7 +10,7 @@ and length) and defining a specific "persona" through a system prompt.
 ## Summary
 
 - **Type**: [C1](https://valawai.github.io/docs/components/C1/)
-- **Name**: LLM e-mail replier
+- **Name**: LLM E-Mail Replier
 - **Documentation**: [https://valawai.github.io/docs/components/C1/llm_email_replier](https://valawai.github.io/docs/components/C1/llm_email_replier)
 - **Versions**:
   - **Stable version**: [1.2.0 (February 19, 2026)](https://github.com/VALAWAI/C1_llm_email_replier/tree/1.2.0)
@@ -77,6 +77,16 @@ Here's how to quickly get it running:
    ```bash
    COMPOSE_PROFILES=component docker compose up -d
    ```
+
+3. ### Stop All Containers
+
+   To stop all containers launched, run:
+
+   ```bash
+   COMPOSE_PROFILES=all docker compose down
+   ```
+
+   This command stops the MOV and RabbitMQ containers.
 
 ## Development environment
 

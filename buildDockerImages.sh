@@ -5,7 +5,8 @@ if ! docker stats --no-stream >/dev/null 2>&1; then
 else
 	DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 	pushd $DIR > /dev/null
-	TAG=$(grep --max-count=1 "__version__" src/c1_llm_email_replier/__init__.py  | awk -F "\"" '{ print $2 }')
+  COMPONENT_ID="c1_llm_email_replier"
+	TAG=$(grep --max-count=1 "__version__" src/$COMPONENT_ID/__init__.py  | awk -F "\"" '{ print $2 }')
 
 	DOCKER_ARGS=""
 	PLATFORMS=""
@@ -42,24 +43,27 @@ else
           exit 1
           ;;
       esac
-    done
+  done
 
+	IMAGE_TAG="valawai/$COMPONENT_ID:$TAG"
+	IMAGE_BUILD_NAME="$COMPONENT_ID_builder"
+  CACHE_DIR=".$COMPONENT_ID-docker-cache"
 	pushd $DIR > /dev/null
 	if [[ -z $PLATFORMS ]];
 	then
-		DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS --pull -f docker/main/Dockerfile -t valawai/c1_llm_email_replier:$TAG .
+		DOCKER_BUILDKIT=1 docker build $DOCKER_ARGS --pull -f docker/main/Dockerfile -t $IMAGE_TAG .
 	else
-		if docker buildx ls 2>/dev/null| grep -q c1_llm_email_replier_builder;
+		if docker buildx ls 2>/dev/null| grep -q $IMAGE_BUILD_NAME;
 		then
-  			DOCKER_BUILDKIT=1 docker buildx use c1_llm_email_replier_builder
+  			DOCKER_BUILDKIT=1 docker buildx use $IMAGE_BUILD_NAME
 		else
-  			DOCKER_BUILDKIT=1 docker buildx create --name c1_llm_email_replier_builder --platform=$PLATFORMS --use
+  			DOCKER_BUILDKIT=1 docker buildx create --name $IMAGE_BUILD_NAME --platform=$PLATFORMS --use
 		fi
 		DOCKER_ARGS="$DOCKER_ARGS --platform=$PLATFORMS"
 		DOCKER_ARGS="$DOCKER_ARGS -f docker/main/Dockerfile"
-		DOCKER_ARGS="$DOCKER_ARGS -t valawai/c1_llm_email_replier:$TAG"
-		DOCKER_ARGS="$DOCKER_ARGS --cache-from=type=local,src=.c1_llm_email_replier-docker-cache"
-		DOCKER_ARGS="$DOCKER_ARGS --cache-to=type=local,dest=.c1_llm_email_replier-docker-cache"
+		DOCKER_ARGS="$DOCKER_ARGS -t $IMAGE_TAG"
+		DOCKER_ARGS="$DOCKER_ARGS --cache-from=type=local,src=$CACHE_DIR"
+		DOCKER_ARGS="$DOCKER_ARGS --cache-to=type=local,dest=$CACHE_DIR"
 		DOCKER_ARGS="$DOCKER_ARGS --push"
 		DOCKER_BUILDKIT=1 docker buildx build $DOCKER_ARGS .
 	fi
