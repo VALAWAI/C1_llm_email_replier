@@ -1,19 +1,19 @@
-# 
+#
 # This file is part of the C1_llm_email_replier distribution (https://github.com/VALAWAI/C1_llm_email_replier).
 # Copyright (c) 2022-2026 VALAWAI (https://valawai.eu/).
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 import os
@@ -31,13 +31,11 @@ from c1_llm_email_replier.mov import MOV
 
 
 class TestChangeParametersHandler(unittest.TestCase):
-  """Class to test the handler of the messages to change the component parameters.
-  """
+  """Class to test the handler of the messages to change the component parameters."""
 
   @classmethod
   def setUpClass(cls):
-    """Create the handler.
-    """
+    """Create the handler."""
 
     cls.message_service = MessageService()
     cls.mov = MOV(cls.message_service)
@@ -46,8 +44,7 @@ class TestChangeParametersHandler(unittest.TestCase):
 
   @classmethod
   def tearDownClass(cls):
-    """Stops the message service.
-    """
+    """Stops the message service."""
 
     cls.mov.unregister_component()
     cls.message_service.close()

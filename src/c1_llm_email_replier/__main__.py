@@ -135,7 +135,6 @@ def configure_log():
 
         logging.basicConfig(level=logging.INFO)
         logging.exception("Could not configure the logging")
-       
 
 
 def main():
@@ -145,7 +144,6 @@ def main():
     app = App()
     app.start()
     app.stop()
-        
 
 
 if __name__ == "__main__":
